@@ -285,7 +285,7 @@ function showApp(masterToken, uid, appToken, manifestPath) {
     document.getElementById('icons').innerHTML +=
       '<div class="square">'
       + '<span class="remove_" onclick="remove(\''+appToken+'\');">X</span>'
-      + '<a target="_blank" href="' + manifest.origin + manifest.launch_path
+      + '<a href="' + manifest.origin + manifest.launch_path
       + '#storage_root='+encodeURIComponent(remoteStorageOrigin
         + '/?user=' + encodeURIComponent(uid) + '&path=')
       + '&storage_api=2011.04&access_token=' + encodeURIComponent(appToken)+'">'
