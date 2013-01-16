@@ -8,12 +8,12 @@ These instructions assume standard install with apache2 on a debian-like system.
 
 * First, install owncloud as normal. 
 * Copy the open\_web\_apps folder into /var/www/apps/
-* sudo apt-get install libxattr1-dev pear
-* sudo pecl install xattr
-* sudo service apache2 restart
 * choose a storage origin. This can be an additional subdomain, or an additional port on which Apache should listen, like https://example.com:44344
 * add this origin as an additional vhost to apache config and point it to /var/www/apps/open\_web\_apps/storage\_root/
 * make sure the AllowOverride directive for this vhost allows /var/www/apps/open\_web\_apps/storage\_root/.htaccess to set its RewriteRule
+* sudo apt-get install libxattr1-dev pear
+* sudo pecl install xattr
+* sudo service apache2 restart
 * log in to owncloud as an admin and activate the app
 * configure the storage origin in the owncloud admin settings
 
