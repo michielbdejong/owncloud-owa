@@ -23,12 +23,34 @@
 *
 */
 
+require_once 'lib/storage.php';
+
 // Check if we are a user
 OCP\User::checkLoggedIn();
 
+//fetch the list of apps:
+$uid = OCP\USER::getUser();
+try {
+	$stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*open_web_apps` WHERE `uid_owner` = ?' );
+	$result = $stmt->execute(array($uid));
+} catch(Exception $e) {
+	OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
+	OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' uid: '.$uid, OCP\Util::DEBUG);
+	return false;
+}
+$apps = $result->fetchAll();
+for($i=0; $i<count($apps); $i++) {
+  $obj = MyStorage::get($uid, $apps[$i]['manifest_path']);
+  try {
+    $apps[$i]['manifest'] = json_decode($obj['content'], true);
+  } catch(Exception $e) {
+  }
+}
 $storage_origin = OCP\Config::getAppValue('open_web_apps',  "storage_origin", '' );
 OCP\App::setActiveNavigationEntry( 'open_web_apps' );
 //OCP\Util::addScript( "open_web_apps", "helpers" );
 $tmpl = new OCP\Template( 'open_web_apps', 'main', 'user' );
+$tmpl->assign( 'uid', $uid );
 $tmpl->assign( 'storage_origin', $storage_origin );
+$tmpl->assign( 'apps', $apps );
 $tmpl->printPage();

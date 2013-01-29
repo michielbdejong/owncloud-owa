@@ -1,6 +1,25 @@
 <style> .square { border-style:solid; border-width:1px; float:left; width:160px; height:160px; display:block; overflow:hidden; text-align:center} </style>
 <style id="editMode"> .remove_ { display: inline; } </style>
 <div style="width:100%" id="icons">
+<?php
+  for($i=0; $i<count($_['apps']);$i++) {
+    if($_['apps'][$i]['manifest']) {
+      echo '<div class="square">'
+        . '<span class="remove_" onclick="remove(\'' . $_['apps'][$i]['access_token'] . '\');">X</span>'
+        . '<a href="' . $_['apps'][$i]['manifest']['origin'] . $_['apps'][$i]['manifest']['launch_path']
+        . '#storage_root=' . urlencode(
+          $_['storage_origin']
+          . '/?user=' . $_['uid'] . '&path='
+        ). '&storage_api=2011.04&access_token=' . urlencode($_['apps'][$i]['access_token'])
+        . '">'
+        . '<img width="128px" height="128px" src="' . htmlentities(
+           $_['apps'][$i]['manifest']['origin'] . $_['apps'][$i]['manifest']['icons']['128']
+        ) . '">'//TODO: there is probably a better way to escape the icon URL?
+        . '<p>' . htmlentities($_['apps'][$i]['manifest']['name']) . '</p>'//TODO: there is probably a better way to escape the name field?
+        . '</a> </div>';
+    }
+  }
+?>
 </div>
 <input id="mainButton" type="submit" value="edit" onclick="changeMode()">
 <div id="updateDiv">
@@ -21,6 +40,13 @@
     console.log(parsedParams);
     installApp(parsedParams);
   }
+  function makeLaunchUrl(manifest, remoteStorageOrigin, uid, appToken) {
+    return manifest.origin + manifest.launch_path
+      + '#storage_root='+encodeURIComponent(remoteStorageOrigin
+      + '/?user=' + encodeURIComponent(uid) + '&path=')
+      + '&storage_api=2011.04&access_token=' + encodeURIComponent(appToken);
+  }
+      
   function checkForAdd() {
     var rawParams = location.search.substring(1).split('&');
     for(var i=0; i<rawParams.length; i++) {
@@ -49,6 +75,9 @@
       }
     }
     if(parsedParams.addRequested) {
+      //if(haveAppAlready()) {
+      //  window.location = makeLaunchURL(parsedParams, ...
+      //} else { ... 
       var str = 'Give '+parsedParams.name+' access to '
       for(var i in parsedParams.permissions) {
         if(i=='root') {
@@ -285,10 +314,9 @@ function showApp(masterToken, uid, appToken, manifestPath) {
     document.getElementById('icons').innerHTML +=
       '<div class="square">'
       + '<span class="remove_" onclick="remove(\''+appToken+'\');">X</span>'
-      + '<a href="' + manifest.origin + manifest.launch_path
-      + '#storage_root='+encodeURIComponent(remoteStorageOrigin
-        + '/?user=' + encodeURIComponent(uid) + '&path=')
-      + '&storage_api=2011.04&access_token=' + encodeURIComponent(appToken)+'">'
+      + '<a href="'
+      + makeLaunchUrl(manifest, remoteStorageOrigin, uid, appToken)
+      + '">'
       + '<img width="128px" height="128px" src="' + manifest.origin + manifest.icons['128'] + '">'
       + '<p>' + manifest.name + '</p>'
       +'</a> </div>';
@@ -300,41 +328,34 @@ function render() {
   }
   var uid = 'admin';
   rendering++;
-  ajax('listapps.php', {}, function(err, data) {
+  //ajax('listapps.php', {}, function(err, data) {
     rendering --;
     document.getElementById('icons').innerHTML = '';
-    var content;
-    try {
-      content=JSON.parse(data.content);
-    } catch(e) {
-      console.log(e);
-    }
-    console.log(content);
     var masterToken;
-    for(var i=0; i<content.apps.length; i++) {
-      if(content.apps[i].manifest_path=='appsapp') {
-        masterToken = content.apps[i].access_token;
+    for(var i=0; i<apps.length; i++) {
+      if(apps[i].manifest_path=='appsapp') {
+        masterToken = apps[i].access_token;
         break;
       }
     }
     console.log(masterToken);
     document.getElementById('icons').innerHTML = '';
-    for(var i=0; i<content.apps.length; i++) {
-      if(content.apps[i].manifest_path!='appsapp') {
-        console.log(content.apps[i]);
-        showApp(masterToken, uid, content.apps[i].access_token, content.apps[i].manifest_path);
+    for(var i=0; i<apps.length; i++) {
+      if(apps[i].manifest_path!='appsapp') {
+        console.log(apps[i]);
+        showApp(masterToken, uid, apps[i].access_token, apps[i].manifest_path);
         console.log('added another app, showing mode '+mode);
         showMode();
       }
     }
-  });
+  //});
 }
 
 var remoteStorageOrigin = '<?php require_once 'public/config.php'; echo OCP\Config::getAppValue('open_web_apps', 'storage_origin'); ?>';
 
 if((remoteStorageOrigin == '') || (window.location == remoteStorageOrigin)) {
   document.getElementById('icons').innerHTML = 'You need to point a second origin to your server, so a subdomain, or a port other than '+window.location+'. Then go to Setting -> Admin -> Unhosted apps and set the storage origin.';
-} else {
-  render();
+//} else {
+  //render();
 }
 </script>
