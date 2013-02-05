@@ -7,10 +7,8 @@
       echo '<div class="square">'
         . '<span class="remove_" onclick="remove(\'' . $_['apps'][$i]['access_token'] . '\');">X</span>'
         . '<a href="' . $_['apps'][$i]['manifest']['origin'] . $_['apps'][$i]['manifest']['launch_path']
-        . '#storage_root=' . urlencode(
-          $_['storage_origin']
-          . '/?user=' . $_['uid'] . '&path='
-        ). '&storage_api=2011.04&access_token=' . urlencode($_['apps'][$i]['access_token'])
+        . '#remotestorage=' . urlencode($_['user_address'])
+        . '&access_token=' . urlencode($_['apps'][$i]['access_token'])
         . '">'
         . '<img width="128px" height="128px" src="' . htmlentities(
            $_['apps'][$i]['manifest']['origin'] . $_['apps'][$i]['manifest']['icons']['128']
@@ -40,11 +38,10 @@
     console.log(parsedParams);
     installApp(parsedParams);
   }
-  function makeLaunchUrl(manifest, remoteStorageOrigin, uid, appToken) {
+  function makeLaunchUrl(manifest, userAddress, appToken) {
     return manifest.origin + manifest.launch_path
-      + '#storage_root='+encodeURIComponent(remoteStorageOrigin
-      + '/?user=' + encodeURIComponent(uid) + '&path=')
-      + '&storage_api=2011.04&access_token=' + encodeURIComponent(appToken);
+      + '#remotestorage='+encodeURIComponent(userAddress)
+      + '&access_token=' + encodeURIComponent(appToken);
   }
       
   function checkForAdd() {
@@ -315,7 +312,7 @@ function showApp(masterToken, uid, appToken, manifestPath) {
       '<div class="square">'
       + '<span class="remove_" onclick="remove(\''+appToken+'\');">X</span>'
       + '<a href="'
-      + makeLaunchUrl(manifest, remoteStorageOrigin, uid, appToken)
+      + makeLaunchUrl(manifest, "<?php echo $_['user_address'];?>", appToken)
       + '">'
       + '<img width="128px" height="128px" src="' + manifest.origin + manifest.icons['128'] + '">'
       + '<p>' + manifest.name + '</p>'

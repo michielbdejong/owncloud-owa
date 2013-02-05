@@ -50,6 +50,7 @@ $storage_origin = OCP\Config::getAppValue('open_web_apps',  "storage_origin", ''
 OCP\App::setActiveNavigationEntry( 'open_web_apps' );
 //OCP\Util::addScript( "open_web_apps", "helpers" );
 $tmpl = new OCP\Template( 'open_web_apps', 'main', 'user' );
+$tmpl->assign( 'user_address', $uid.'@'.$_SERVER['SERVER_NAME'] );
 $tmpl->assign( 'uid', $uid );
 $tmpl->assign( 'storage_origin', $storage_origin );
 $tmpl->assign( 'apps', $apps );
