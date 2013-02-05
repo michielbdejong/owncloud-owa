@@ -13,6 +13,7 @@
     <p>storage root: <input id="storageRoot" />
       storage type: <input id="storageType" />
       auth endpoint: <input id="authEndpoint" />
+      content type: <input id="contentType" />
       <input type="submit" onclick="test3();" value="3"/>
       <input type="submit" onclick="test4();" value="4"/></p>
     <p>token: <input id="token" />
@@ -35,7 +36,7 @@
         xhr.setRequestHeader('Authorization', 'Bearer '+token);
       }
       xhr.onload = function(e) {
-        cb((this.status == 200 ? null : this.status), this.response);
+        cb((this.status == 200 ? null : this.status), this.response, this.getAllResponseHeaders());
       }
       xhr.send();
     }
@@ -55,15 +56,17 @@
     function test2() {
       var parts = val('userAddress').split('@');
       get('https://'+parts[1]+'/.well-known/webfinger?resource='+encodeURIComponent('acct:'+parts[0]+'@'+parts[1]),
-          null, function(err, data) {
+          null, function(err, data, responseHeaders) {
         console.log(err);
         console.log(data);
+        console.log(typeof(responseHeaders));
         var obj = JSON.parse(data);
         for(var i=0; i<obj.links.length; i++) {
           if(obj.links[i].rel == 'remotestorage') {
             val('storageRoot', obj.links[i].href);
             val('storageType', obj.links[i].type);
             val('authEndpoint', obj.links[i].properties['auth-endpoint']);
+            val('contentType', responseHeaders['content-type']);
           }
         }
       });
@@ -76,7 +79,7 @@
         + '&scope=' + encodeURIComponent('root:rw');
     }
     function test4() {
-      val('access_token', getParam('token'));
+      val('token', getParam('access_token'));
       val('scope', getParam('scope'));
     }
     function test5() {

@@ -4,23 +4,12 @@
 <?php
   for($i=0; $i<count($_['apps']);$i++) {
     if($_['apps'][$i]['manifest']) {
-      $scopes = array();
-      $scopeStrParts = array();
-      foreach($_['apps'][$i]['scopes']['r'] as $module) {
-        $scopes[$module] = 'r'; 
-      }
-      foreach($_['apps'][$i]['scopes']['w'] as $module) {
-        $scopes[$module] = 'rw';
-      }
-      foreach($scopes as $module => $level) {
-        $scopeStrParts[] = $module+':'+$level;
-      }
       echo '<div class="square">'
         . '<span class="remove_" onclick="remove(\'' . $_['apps'][$i]['access_token'] . '\');">X</span>'
         . '<a href="' . $_['apps'][$i]['manifest']['origin'] . $_['apps'][$i]['manifest']['launch_path']
         . '#remotestorage=' . urlencode($_['user_address'])
         . '&access_token=' . urlencode($_['apps'][$i]['access_token'])
-        . '&scope=' . urlencode($scopeStrParts.implode(' '))
+        . '&scope=' . urlencode($_['apps'][$i]['scopes'])
         . '">'
         . '<img width="128px" height="128px" src="' . htmlentities(
            $_['apps'][$i]['manifest']['origin'] . $_['apps'][$i]['manifest']['icons']['128']
