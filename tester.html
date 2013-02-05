@@ -33,6 +33,7 @@
       xhr.open('GET', url);
       if(token) {
         xhr.setRequestHeader('Authorization', 'Bearer '+token);
+      }
       xhr.onload = function(e) {
         cb((this.status == 200 ? null : this.status), this.response);
       }
@@ -58,9 +59,9 @@
         console.log(err);
         console.log(data);
         var obj = JSON.parse(data);
-        for(var i=0; i< obj.links.length; i++) {
+        for(var i=0; i<obj.links.length; i++) {
           if(obj.links[i].rel == 'remotestorage') {
-            val('storageRoot'), obj.links[i].href);
+            val('storageRoot', obj.links[i].href);
             val('storageType', obj.links[i].type);
             val('authEndpoint', obj.links[i].properties['auth-endpoint']);
           }
@@ -75,7 +76,7 @@
         + '&scope=' + encodeURIComponent('root:rw');
     }
     function test4() {
-      val('token', getParam('token'));
+      val('access_token', getParam('token'));
       val('scope', getParam('scope'));
     }
     function test5() {

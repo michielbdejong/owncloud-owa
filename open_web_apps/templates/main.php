@@ -4,11 +4,23 @@
 <?php
   for($i=0; $i<count($_['apps']);$i++) {
     if($_['apps'][$i]['manifest']) {
+      $scopes = array();
+      $scopeStrParts = array();
+      foreach($_['apps'][$i]['scopes']['r'] as $module) {
+        $scopes[$module] = 'r'; 
+      }
+      foreach($_['apps'][$i]['scopes']['w'] as $module) {
+        $scopes[$module] = 'rw';
+      }
+      foreach($scopes as $module => $level) {
+        $scopeStrParts[] = $module+':'+$level;
+      }
       echo '<div class="square">'
         . '<span class="remove_" onclick="remove(\'' . $_['apps'][$i]['access_token'] . '\');">X</span>'
         . '<a href="' . $_['apps'][$i]['manifest']['origin'] . $_['apps'][$i]['manifest']['launch_path']
         . '#remotestorage=' . urlencode($_['user_address'])
         . '&access_token=' . urlencode($_['apps'][$i]['access_token'])
+        . '&scope=' . urlencode($scopeStrParts.implode(' '))
         . '">'
         . '<img width="128px" height="128px" src="' . htmlentities(
            $_['apps'][$i]['manifest']['origin'] . $_['apps'][$i]['manifest']['icons']['128']
@@ -37,11 +49,6 @@
     console.log('installing:');
     console.log(parsedParams);
     installApp(parsedParams);
-  }
-  function makeLaunchUrl(manifest, userAddress, appToken) {
-    return manifest.origin + manifest.launch_path
-      + '#remotestorage='+encodeURIComponent(userAddress)
-      + '&access_token=' + encodeURIComponent(appToken);
   }
       
   function checkForAdd() {
@@ -136,101 +143,6 @@ function ajax(endpoint, params, cb) {
   xhr.setRequestHeader('requesttoken', oc_requesttoken);
   xhr.send(JSON.stringify(params));
 }
-function rsget(token, uid, path, cb) {
-  var xhr = new XMLHttpRequest();
-  var path = remoteStorageOrigin+'/?user='+encodeURIComponent(uid)+'&path='+encodeURIComponent('/'+path);
-  xhr.open('GET', path, true);
-  xhr.onreadystatechange = function() {
-    if(xhr.readyState == 4) {
-      if(xhr.status==200) {
-        console.log('rsget success');
-        cb(null, {
-          contentType: xhr.getResponseHeader('Content-Type'),
-          content: xhr.responseText
-        });
-      } else {
-        console.log('rsget fail 1');
-        cb(xhr.status);
-      }
-    }
-  };
-  xhr.setRequestHeader('Authorization', 'Bearer '+token);
-  xhr.send();
-}
-function rsput(token, uid, path, contentType, content, cb) {
-  var xhr = new XMLHttpRequest();
-  var path = remoteStorageOrigin+'/?user='+encodeURIComponent(uid)+'&path='+encodeURIComponent('/'+path);
-  xhr.open('PUT', path, true);
-  xhr.onreadystatechange = function() {
-    if(xhr.readyState == 4) {
-      if(xhr.status==200) {
-        console.log('rsput success');
-        cb(null, {
-          contentType: xhr.getResponseHeader('Content-Type'),
-          content: xhr.responseText
-        });
-      } else {
-        console.log('rsput fail 1');
-        cb(xhr.status);
-      }
-    }
-  };
-  xhr.setRequestHeader('Authorization', 'Bearer '+token);
-  xhr.setRequestHeader('Content-Type', contentType);
-  xhr.send(content);
-}
-function rsdel(token, uid, path, cb) {
-  var xhr = new XMLHttpRequest();
-  var path = remoteStorageOrigin+'/?user='+encodeURIComponent(uid)+'&path='+encodeURIComponent('/'+path);
-  xhr.open('DELETE', path, true);
-  xhr.onreadystatechange = function() {
-    if(xhr.readyState == 4) {
-      if(xhr.status==200) {
-        console.log('rsget success');
-        cb(null, {
-          contentType: xhr.getResponseHeader('Content-Type'),
-          content: xhr.responseText
-        });
-      } else {
-        console.log('rsget fail 1');
-        cb(xhr.status);
-      }
-    }
-  };
-  xhr.setRequestHeader('Authorization', 'Bearer '+token);
-  xhr.send();
-}
-function retrieve(url, cb) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', url, true);
-  xhr.onreadystatechange = function() {
-    if(xhr.readyState == 4) {
-      if(xhr.status==200) {
-        console.log('retrieve success');
-        cb(null, {
-          contentType: xhr.getResponseHeader('Content-Type'),
-          content: xhr.responseText
-        });
-      } else {
-        console.log('retrieve fail 1');
-        cb(xhr.status);
-      }
-    }
-  };
-  xhr.send();
-}
-function installDefaultApps() {
-  retrieve(document.getElementById('appsource').value, function(err1, data1) {
-    var apps = [];
-    try {
-      apps = JSON.parse(data1.content);
-    } catch(e) {
-    }
-    for(var i=0; i<apps.length; i++) {
-      installApp(apps[i]);
-    }
-  });
-}
 function addLaunchURL() {
   installApp({
     "origin":document.getElementById('appsource').value,
@@ -296,63 +208,5 @@ function remove(token) {
     render();
   });
 }
-var rendering=0;
-function showApp(masterToken, uid, appToken, manifestPath) {
-  rendering++;
-  console.log('showApp('+masterToken+', '+uid+', '+appToken+', '+manifestPath+');');
-  rsget(masterToken, uid, manifestPath, function(err, data) {
-    rendering--;
-    try {
-      manifest=JSON.parse(data.content);
-    } catch(e) {
-      console.log(e);
-    }
-     
-    document.getElementById('icons').innerHTML +=
-      '<div class="square">'
-      + '<span class="remove_" onclick="remove(\''+appToken+'\');">X</span>'
-      + '<a href="'
-      + makeLaunchUrl(manifest, "<?php echo $_['user_address'];?>", appToken)
-      + '">'
-      + '<img width="128px" height="128px" src="' + manifest.origin + manifest.icons['128'] + '">'
-      + '<p>' + manifest.name + '</p>'
-      +'</a> </div>';
-  });
-}
-function render() {
-  if(rendering) {
-    return;
-  }
-  var uid = 'admin';
-  rendering++;
-  //ajax('listapps.php', {}, function(err, data) {
-    rendering --;
-    document.getElementById('icons').innerHTML = '';
-    var masterToken;
-    for(var i=0; i<apps.length; i++) {
-      if(apps[i].manifest_path=='appsapp') {
-        masterToken = apps[i].access_token;
-        break;
-      }
-    }
-    console.log(masterToken);
-    document.getElementById('icons').innerHTML = '';
-    for(var i=0; i<apps.length; i++) {
-      if(apps[i].manifest_path!='appsapp') {
-        console.log(apps[i]);
-        showApp(masterToken, uid, apps[i].access_token, apps[i].manifest_path);
-        console.log('added another app, showing mode '+mode);
-        showMode();
-      }
-    }
-  //});
-}
 
-var remoteStorageOrigin = '<?php require_once 'public/config.php'; echo OCP\Config::getAppValue('open_web_apps', 'storage_origin'); ?>';
-
-if((remoteStorageOrigin == '') || (window.location == remoteStorageOrigin)) {
-  document.getElementById('icons').innerHTML = 'You need to point a second origin to your server, so a subdomain, or a port other than '+window.location+'. Then go to Setting -> Admin -> Unhosted apps and set the storage origin.';
-//} else {
-  //render();
-}
 </script>
