@@ -26,6 +26,10 @@
 require_once '../../../lib/base.php';
 require_once '../lib/rest.php';
 
+
+//deal with e.g. one-hour DJ sets, which can easily be 300Mb in practice:
+ini_set('memory_limit', "1024M");
+
 $requiredOrigin = OCP\Config::getAppValue('open_web_apps',  "storage_origin", '' );//set the storage origin to something else than the owncloud admin interface origin to avoid xss vulnz.
 if(($_SERVER['HTTPS']?'https://':'http://').$_SERVER['HTTP_HOST'] != $requiredOrigin) {
   die('please visit on '.$requiredOrigin);

@@ -13,6 +13,13 @@ These instructions assume standard install with apache2 on a debian-like system.
 * make sure the AllowOverride directive for this vhost allows /var/www/apps/open\_web\_apps/storage\_root/.htaccess to set its RewriteRule
 * sudo apt-get install libxattr1-dev pear
 * sudo pecl install xattr
+* in /etc/apache2/sites-enabled/default-ssl, add:
+
+    <Directory /var/www/.well-known/>
+       Header set Access-Control-Allow-Origin "*"
+    </Directory>
+
+* copy the 'webfinger' file to /var/www/.well-known/webfinger.
 * sudo service apache2 restart
 * log in to owncloud as an admin and activate the app
 * configure the storage origin in the owncloud admin settings
