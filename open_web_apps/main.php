@@ -30,36 +30,52 @@ OCP\User::checkLoggedIn();
 
 //fetch the list of apps:
 $uid = OCP\USER::getUser();
-try {
-	$stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*open_web_apps` WHERE `uid_owner` = ?' );
-	$result = $stmt->execute(array($uid));
-} catch(Exception $e) {
-	OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
-	OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' uid: '.$uid, OCP\Util::DEBUG);
-	return false;
+function getScope($token) {
+	try {
+		$stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*remotestorage_access` WHERE `access_token` = ?' );
+		$result = $stmt->execute(array($token));
+	} catch(Exception $e) {
+		OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
+		OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' token: '.$token, OCP\Util::DEBUG);
+		return false;
+	}
+	$scopesFromDb = $result->fetchAll();
+        $strs = array();
+	foreach($scopesFromDb as $obj) {
+		$strs[] = $obj['module'].':'.$obj['level'];
+	}
+	return implode(' ', $strs);
 }
-$appsFromDb = $result->fetchAll();
-$apps = array();
-for($i=0; $i<count($appsFromDb); $i++) {
-  $obj = MyStorage::get($uid, $appsFromDb[$i]['manifest_path']);
-  $manifest;
-  try {
-    $manifest = json_decode($obj['content'], true);
-  } catch(Exception $e) {
-  }
-  if($manifest) {
-    $launchUrl = $manifest['origin'].$manifest['launch_path'];
-    $apps[$launchUrl] = array(
-      'name' => $manifest['name'],
-      'icon' => $manifest['icons']['128'],
-      'scope' => $appsFromDb[$i]['scope'],
-      'token' => $appsFromDb[$i]['token']
-    );
-  }
+function getApps() {
+	try {
+		$stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*open_web_apps` WHERE `uid_owner` = ?' );
+		$result = $stmt->execute(array($uid));
+	} catch(Exception $e) {
+		OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
+		OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' uid: '.$uid, OCP\Util::DEBUG);
+		return false;
+	}
+	$appsFromDb = $result->fetchAll();
+	$apps = array();
+	foreach($appsFromDb as $app) {
+		$ret = MyStorage::get($uid, $app['manifest_path']);
+		$manifest;
+		try {
+			$manifest = json_decode($ret['content'], true);
+		} catch(Exception $e) {
+		}
+ 		if($manifest) {
+			$launchUrl = $manifest['origin'].$manifest['launch_path'];
+			$apps[$launchUrl] = array(
+				'name' => $manifest['name'],
+				'icon' => $manifest['icons']['128'],
+				'scope' => getScope($app['token']),
+				'token' => $app['token']
+			);
+		}
+	}
+	return $apps;
 }
-$storage_origin = OCP\Config::getAppValue('open_web_apps',  "storage_origin", '' );
-OCP\App::setActiveNavigationEntry( 'open_web_apps' );
-//OCP\Util::addScript( "open_web_apps", "helpers" );
 
 function toHuman($map) {
   $items = array();
@@ -151,19 +167,31 @@ function checkForAdd() {
     if($apps[$params['redirect_uri']]) {
       $scopeDiff = calcScopeDiff($params['redirect_uri'], $params['scope']);
       if($scopeDiff) {
-        $tmpl->assign( 'scope_diff_app', $params['redirect_uri'] );
-        $tmpl->assign( 'scope_diff_add', $scopeDiff );
+        return array(
+	  'scope_diff_app' => $params['redirect_uri'],
+          'scope_diff_add' => $scopeDiff
+        );
       } else {
-        $tmpl->assign( 'launch_app', $params['redirect_uri'] );
+        return array( 'launch_app' => $params['redirect_uri'] );
       }
     } else {
-      $tmpl->assign( 'adding_app', $params['redirect_uri'] );
-      $tmpl->assign( 'adding_name', $params['client_id'] );
-      $tmpl->assign( 'adding_scope', parseScope($params['scope']) );
+      return array(
+        'adding_app' => $params['redirect_uri'],
+        'adding_name' => $params['client_id'],
+        'adding_scope' => parseScope($params['scope'])
+      );
     }
   }
 }
+
+//...
+$apps = getApps();
+$storage_origin = OCP\Config::getAppValue('open_web_apps',  "storage_origin", '' );
+OCP\App::setActiveNavigationEntry( 'open_web_apps' );
 $tmpl = new OCP\Template( 'open_web_apps', 'main', 'user' );
+foreach(checkForAdd() as $k => $v) {
+  $tmpl->assign($k, $v);
+}
 $tmpl->assign( 'user_address', $uid.'@'.$_SERVER['SERVER_NAME'] );
 $tmpl->assign( 'uid', $uid );
 $tmpl->assign( 'storage_origin', $storage_origin );
