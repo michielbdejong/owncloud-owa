@@ -105,6 +105,29 @@ function toHuman($map) {
     return $str.' and '.$items[count($items)-1];
   }
 }
+function parseRedirectUri($dirty) {
+  $parts = explode('/', $dirty);
+  if(count($parts)<4) {
+    return array(null, null);
+  }
+  if($parts[0] == 'http:') {
+    $protocol = 'http';
+  } else if($parts[0] == 'https:') {
+    $protocol = 'https';
+  } else {
+    return array(null, null);
+  }
+  if($parts[1] != '') {
+    return array(null, null);
+  }
+  $hostParts = explode(':', $parts[2]);
+  $hostName = ereg_replace('[^a-zA-Z0-9\-\.]', '', $hostParts[0]);
+  $hostPort = ereg_replace('[^0-9]', '', $hostParts[1]);
+  return array(
+    $protocol.'_'.$hostName.'_'.$hostPort,
+    '/'.ereg_replace('[<\']', '', implode('/', array_slice($parts, 3)))
+  );
+}
 function parseScope($scope) {
   $map = array();
   $parts = explode(' ', $scope);
@@ -164,19 +187,21 @@ function checkForAdd() {
     }
   }
   if($params['redirect_uri'] && $params['scope']) {
-    if($apps[$params['redirect_uri']]) {
-      $scopeDiff = calcScopeDiff($params['redirect_uri'], $params['scope']);
+    list($origin, $launchPath) = parseRedirectUri($params['redirect_uri']);
+    if($apps[$origin]) {
+      $scopeDiff = calcScopeDiff($origin, $params['scope']);
       if($scopeDiff) {
         return array(
-	  'scope_diff_app' => $params['redirect_uri'],
+	  'scope_diff_origin' => $origin,
           'scope_diff_add' => $scopeDiff
         );
       } else {
-        return array( 'launch_app' => $params['redirect_uri'] );
+        return array( 'launch_app' => $origin );
       }
     } else {
       return array(
-        'adding_app_dirty' => $params['redirect_uri'],
+        'adding_origin' => $origin,
+        'adding_launch_path' => $launchPath,
         'adding_name_dirty' => $params['client_id'],
         'adding_scope' => parseScope($params['scope'])//scope.normalized and scope.human will only contain [a-zA-Z0-9%\-_\.] and spaces
       );

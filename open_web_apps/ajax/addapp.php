@@ -5,6 +5,13 @@
  * later.
  * See the COPYING-README file.
  */
+
+//params:
+// origin      string
+// launch_path string
+// name        string
+// scope       array( module => level )
+
 function handle() {
   try {
     $params = json_decode(file_get_contents('php://input'), true);
@@ -16,25 +23,23 @@ function handle() {
   OCP\JSON::checkAppEnabled('open_web_apps');
   OCP\JSON::callCheck();
 
+  $manifestPath = 'apps/'.$params['name'].'/manifest.json';
+
   $uid = OCP\USER::getUser();
+  $token = base64_encode(OC_Util::generate_random_bytes(40));
   try {
-    $stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*open_web_apps` WHERE `uid_owner` = ? AND `manifest_path` = ? AND `scopes` = ?' );
-    $result = $stmt->execute(array($uid, $params['manifest_path'], $params['scopes']));
+    $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*open_web_apps` (`uid_owner`, `manifest_path`, `access_token`) VALUES (?, ?, ?)' );
+    $result = $stmt->execute(array($uid, $manifestPath, $token));
   } catch(Exception $e) {
+    var_dump($e);
     OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
     OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' uid: '.$uid, OCP\Util::DEBUG);
     return false;
   }
-
-  $apps = $result->fetchAll();
-  if(count($apps)) {
-    $token = $apps[0]['access_token'];
-  } else {
-    $token = base64_encode(OC_Util::generate_random_bytes(40));
-    //var_dump($params);
+  foreach($params['scope'] as $module => $level) {
     try {
-      $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*open_web_apps` (`uid_owner`, `manifest_path`, `access_token`, `scopes`) VALUES (?, ?, ?, ?)' );
-      $result = $stmt->execute(array($uid, $params['manifest_path'], $token, $params['scopes']));
+      $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*remotestorage_access` (`access_token`, `module`, `level`) VALUES (?, ?, ?)' );
+      $result = $stmt->execute(array($token, $module, $level));
     } catch(Exception $e) {
       var_dump($e);
       OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
@@ -42,6 +47,11 @@ function handle() {
       return false;
     }
   }
+  MyStorage.store($manifestPath, json_encode(array(
+    'origin' => $params['origin'],
+    'launch_path' => $params['launch_path'],
+    'name' => $params['name']
+  ), true));
   OCP\JSON::success(array('token'=>$token));
 }
 handle();

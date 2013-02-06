@@ -1,9 +1,17 @@
 <style> .square { border-style: solid; border-width: 2px; float: left; width: 160px; height: 160px; display: block; overflow: hidden; text-align: center; border-radius: 5px } </style>
 <div style="width:100%" id="icons">
 <?php
-  foreach($_['apps'] as $launchUrl => $obj) {
+  foreach($_['apps'] as $origin => $obj) {
+    $originParts = explode('_', $origin);
+    if(count($originParts)==3) {
+      $port = ':'.$originParts[2];
+    } else if(count($originParts)==2) {
+      $port = '';
+    } else {
+      continue;
+    }
     echo '<div class="square">'
-      . '<a href="' . $launchUrl
+      . '<a href="' . $originParts[0].'://'.$originParts[1].$port . $obj['launch_path']
       . '#remotestorage=' . urlencode($_['user_address'])
       . '&access_token=' . urlencode($obj['token'])
       . '&scope=' . urlencode($obj['scope'])
@@ -20,20 +28,19 @@
       . '<p>' . htmlentities($_['adding_name_dirty']) . '</p>'//TODO: there is probably a better way to escape the name field?
       . '<p>wants '.$_['adding_scope']['human']
       .'. <input type="submit" value="Install" onclick="addApp(\''
-      .htmlentities($_['adding_app_dirty']).'\', \''
+      .$_['adding_origin'].'\', \''
+      .$_['adding_launch_path'].'\', \''
       .htmlentities($_['adding_name_dirty']).'\', \''
       .$_['adding_url_scope']['normalized'].'\');" /></p></div>';
   }
 ?>
 </div>
-<div>
+<div style=" clear: left ">
   Manifest: <input id="manifestUrl" value="http://music.michiel.5apps.com/michiel_music.webapp" style="width:20em" />
   <input type="submit" value="add manifest" onclick="addManifest();" />
 </div>
 <script>
   function ajax(endpoint, params, cb) {
-    alert(JSON.stringify(params));
-    return;
     var xhr = new XMLHttpRequest();
     var path = '/?app=open_web_apps&getfile=ajax/'+endpoint;
     xhr.open('POST', path, true);
@@ -64,9 +71,10 @@
     });
   }
 
-  function addApp(url, name, scope) {
+  function addApp(origin, launchPath, name, scope) {
     ajax('addapp.php', {
-      url: url,
+      origin: origin,
+      launch_path: launchPath,
       name: name,
       scope: scope
     }, function() {
