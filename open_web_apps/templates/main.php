@@ -22,7 +22,7 @@
       . '<p>' . htmlentities($obj['name']) . '</p>'//TODO: there is probably a better way to escape the name field?
       . '</a> </div>';
   }
-  if($_['adding_app_dirty']) {
+  if($_['adding_origin']) {
     echo '<div class="square" style="border-style:dotted">'
       . '<img width="128px" height="128px" src="">'
       . '<p>' . htmlentities($_['adding_name_dirty']) . '</p>'//TODO: there is probably a better way to escape the name field?
