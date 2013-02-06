@@ -12,7 +12,7 @@
 // name        string
 // scope       array( module => level )
 
-require('../lib/storage.php');
+require('open_web_apps/lib/storage.php');
 
 function handle() {
   try {

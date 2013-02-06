@@ -25,11 +25,6 @@
 
 require_once 'lib/storage.php';
 
-// Check if we are a user
-OCP\User::checkLoggedIn();
-
-//fetch the list of apps:
-$uid = OCP\USER::getUser();
 function getScope($token) {
 	try {
 		$stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*remotestorage_access` WHERE `access_token` = ?' );
@@ -46,7 +41,7 @@ function getScope($token) {
 	}
 	return implode(' ', $strs);
 }
-function getApps() {
+function getApps($uid) {
 	try {
 		$stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*open_web_apps` WHERE `uid_owner` = ?' );
 		$result = $stmt->execute(array($uid));
@@ -56,7 +51,7 @@ function getApps() {
 		return false;
 	}
 	$appsFromDb = $result->fetchAll();
-	$apps = array();
+        $apps = array();
 	foreach($appsFromDb as $app) {
 		$ret = MyStorage::get($uid, $app['manifest_path']);
 		$manifest;
@@ -210,7 +205,9 @@ function checkForAdd() {
 }
 
 //...
-$apps = getApps();
+OCP\User::checkLoggedIn();
+$uid = OCP\USER::getUser();
+$apps = getApps($uid);
 $storage_origin = OCP\Config::getAppValue('open_web_apps',  "storage_origin", '' );
 OCP\App::setActiveNavigationEntry( 'open_web_apps' );
 $tmpl = new OCP\Template( 'open_web_apps', 'main', 'user' );
