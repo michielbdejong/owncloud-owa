@@ -12,6 +12,8 @@
 // name        string
 // scope       array( module => level )
 
+require('../lib/storage.php');
+
 function handle() {
   try {
     $params = json_decode(file_get_contents('php://input'), true);
@@ -47,7 +49,7 @@ function handle() {
       return false;
     }
   }
-  MyStorage.store($manifestPath, json_encode(array(
+  MyStorage::store($uid, $manifestPath, 'application/json', json_encode(array(
     'origin' => $params['origin'],
     'launch_path' => $params['launch_path'],
     'name' => $params['name']

@@ -67,7 +67,7 @@
     ajax('addmanifest.php', {
       url: manifestUrl
     }, function() {
-     window.location = '?';
+     //window.location = '?';
     });
   }
 
@@ -78,7 +78,7 @@
       name: name,
       scope: scope
     }, function() {
-     window.location = '?';
+     //window.location = '?';
     });
   }
 
@@ -86,7 +86,7 @@
     ajax('removeapp.php', {
       token: token
     }, function() {
-     window.location = '?';
+     //window.location = '?';
     });
   }
 </script>
