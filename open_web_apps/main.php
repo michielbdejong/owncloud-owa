@@ -176,9 +176,9 @@ function checkForAdd() {
       }
     } else {
       return array(
-        'adding_app' => $params['redirect_uri'],
-        'adding_name' => $params['client_id'],
-        'adding_scope' => parseScope($params['scope'])
+        'adding_app_dirty' => $params['redirect_uri'],
+        'adding_name_dirty' => $params['client_id'],
+        'adding_scope' => parseScope($params['scope'])//scope.normalized and scope.human will only contain [a-zA-Z0-9%\-_\.] and spaces
       );
     }
   }
