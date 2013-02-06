@@ -1,3 +1,4 @@
+<?php var_dump($_);exit();?>
 <style> .square { border-style:solid; border-width:1px; float:left; width:160px; height:160px; display:block; overflow:hidden; text-align:center} </style>
 <style id="editMode"> .remove_ { display: inline; } </style>
 <div style="width:100%" id="icons">
