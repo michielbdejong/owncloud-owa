@@ -16,9 +16,8 @@
       . '&access_token=' . urlencode($obj['token'])
       . '&scope=' . urlencode($obj['scope'])
       . '">'
-      . '<img width="128px" height="128px" src="' . htmlentities(
-         $obj['icon']
-      ) . '">'//TODO: there is probably a better way to escape the icon URL?
+      . '<img width="128px" height="128px" src="' . $obj['icon_url']
+      . '">'
       . '<p>' . htmlentities($obj['name']) . '</p>'//TODO: there is probably a better way to escape the name field?
       . '</a> </div>';
   }

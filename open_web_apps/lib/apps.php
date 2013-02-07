@@ -1,6 +1,18 @@
 <?php
 
+require_once('open_web_apps/lib/storage.php');
+
 class MyApps {
+  public static function getManifest($id) {
+    $ret = MyStorage::get(OCP\USER::getUser(), 'apps/'.$id.'/manifest.json');
+    $manifest;
+    try {
+      $manifest = json_decode($ret['content'], true);
+    } catch(Exception $e) {
+    }
+    $manifest['disk'] = $ret;
+    return $manifest;
+  }
   public static function store($id, $launchPath, $name, $icon, $scopeMap) {
     $manifestPath = 'apps/'.$id.'/manifest.json';
     $uid = OCP\USER::getUser();

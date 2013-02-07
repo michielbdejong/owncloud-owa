@@ -101,6 +101,10 @@ class MyParser {
       'human' => toHuman($map)
     );
   }
+  public static function idToOrigin($id) {
+    $parts = explode('_', $id);
+    return $parts[0].'://'.$parts[1].':'.$parts[2];
+  }
   public static function cleanName($dirty) {
     return ereg_replace('[^a-zA-Z0-9%\-_\.]', '', $dirty); 
   }

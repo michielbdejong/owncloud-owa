@@ -23,7 +23,7 @@
 *
 */
 
-require_once 'lib/storage.php';
+require_once 'lib/apps.php';
 require_once 'lib/parser.php';
 
 function getScope($token) {
@@ -54,17 +54,13 @@ function getApps($uid) {
 	$appsFromDb = $result->fetchAll();
         $apps = array();
 	foreach($appsFromDb as $app) {
-		$ret = MyStorage::get($uid, $app['manifest_path']);
-		$manifest;
-		try {
-			$manifest = json_decode($ret['content'], true);
-		} catch(Exception $e) {
-		}
+		$manifest = MyApps::getManifest($app['app_id']);
  		if($manifest) {
-			$launchUrl = $manifest['origin'].$manifest['launch_path'];
-			$apps[$launchUrl] = array(
+			$origin = MyParser::idToOrigin($app['app_id']);
+			$apps[$app['app_id']] = array(
 				'name' => $manifest['name'],
-				'icon' => $manifest['icons']['128'],
+				'launch_url' => MyParser::parseUrl($origin.$manifest['launch_path'])['clean'],
+				'icon_url' => MyParser::parseUrl($origin.$manifest['icons'][128])['clean'],//in JSON this is ['128']
 				'scope' => getScope($app['token']),
 				'token' => $app['token']
 			);
