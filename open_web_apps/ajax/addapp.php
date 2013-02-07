@@ -32,7 +32,7 @@ function handle() {
   if($token) {
     OCP\JSON::success(array());
   } else {
-    OCP\JSON::failure(array());
+    OCP\JSON::error('could not store');
   }
 }
 handle();

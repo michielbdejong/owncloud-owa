@@ -81,7 +81,7 @@ class MyApps {
     }
     foreach($scopeMap as $module => $level) {
       try {
-       $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*remotestorage_access` (`uid_owner`, `access_token`, `module`, `level`) VALUES (?, ?, ?)' );
+       $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*remotestorage_access` (`uid_owner`, `access_token`, `module`, `level`) VALUES (?, ?, ?, ?)' );
         $result = $stmt->execute(array($uid, $token, $module, $level));
       } catch(Exception $e) {
         var_dump($e);
