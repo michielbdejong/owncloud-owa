@@ -98,7 +98,7 @@ class MyParser {
     return array(
       'map' => $map,
       'normalized' => implode(' ', $reassembleParts),
-      'human' => toHuman($map)
+      'human' => self::toHuman($map)
     );
   }
   public static function idToOrigin($id) {

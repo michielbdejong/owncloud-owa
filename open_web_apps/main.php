@@ -70,7 +70,7 @@ function getApps($uid) {
 }
 function calcScopeDiv($url, $scope) {
   $existingScope = $apps[$url]['scope'];
-  $newScope = parseScope($existingScope.' '.$scope);
+  $newScope = MyParser::parseScope($existingScope.' '.$scope);
   if($newScope['normalized'] == $existingScope) {
     return false;
   } else {
@@ -78,7 +78,7 @@ function calcScopeDiv($url, $scope) {
   }
 }
 
-function checkForAdd() {
+function checkForAdd($apps) {
   $params = array();
   $paramStrs = explode('&', $_SERVER['QUERY_STRING']);
   foreach($paramStrs as $str) {
@@ -88,8 +88,8 @@ function checkForAdd() {
     }
   }
   if($params['redirect_uri'] && $params['scope']) {
-    $urlObj = MyParser::parse($params['redirect_uri']);
-    $appId = $urlObj['protocol'].'_'.$urlObj['host'].'_'.$urlObj['port'];
+    $urlObj = MyParser::parseUrl($params['redirect_uri']);
+    $appId = $urlObj['id'];
     if($apps[$appId]) {
       $scopeDiff = calcScopeDiff($appId, $params['scope']);
       if($scopeDiff) {
@@ -105,7 +105,7 @@ function checkForAdd() {
         'adding_id' => $appId,
         'adding_launch_path' => $launchPath,
         'adding_name_dirty' => $params['client_id'],
-        'adding_scope' => parseScope($params['scope'])//scope.normalized and scope.human will only contain [a-zA-Z0-9%\-_\.] and spaces
+        'adding_scope' => MyParser::parseScope($params['scope'])//scope.normalized and scope.human will only contain [a-zA-Z0-9%\-_\.] and spaces
       );
     }
   }
@@ -118,7 +118,8 @@ $apps = getApps($uid);
 $storage_origin = OCP\Config::getAppValue('open_web_apps',  "storage_origin", '' );
 OCP\App::setActiveNavigationEntry( 'open_web_apps' );
 $tmpl = new OCP\Template( 'open_web_apps', 'main', 'user' );
-foreach(checkForAdd() as $k => $v) {
+$adds = checkForAdd($apps);
+foreach($adds as $k => $v) {
   $tmpl->assign($k, $v);
 }
 $tmpl->assign( 'user_address', $uid.'@'.$_SERVER['SERVER_NAME'] );
