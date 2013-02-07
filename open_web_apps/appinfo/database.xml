@@ -10,12 +10,14 @@
 			<field>
 				<name>uid_owner</name>
 				<type>text</type>
+				<primary>true</primary>
 				<notnull>true</notnull>
 				<length>64</length>
 			</field>
 			<field>
 				<name>app_id</name>
 				<type>text</type>
+				<primary>true</primary>
 				<notnull>true</notnull>
 				<length>100</length>
 			</field>
@@ -30,8 +32,16 @@
 		<name>*dbprefix*remotestorage_access</name>
 		<declaration>
 			<field>
+				<name>uid_owner</name>
+				<type>text</type>
+				<primary>true</primary>
+				<notnull>true</notnull>
+				<length>64</length>
+			</field>
+			<field>
 				<name>access_token</name>
 				<type>text</type>
+				<primary>true</primary>
 				<notnull>true</notnull>
 				<length>100</length>
 			</field>

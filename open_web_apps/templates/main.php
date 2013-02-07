@@ -1,4 +1,4 @@
-<style> .square { border-style: solid; border-width: 2px; float: left; width: 160px; height: 160px; display: block; overflow: hidden; text-align: center; border-radius: 5px } </style>
+<?php var_dump($_); ?><style> .square { border-style: solid; border-width: 2px; float: left; width: 160px; height: 160px; display: block; overflow: hidden; text-align: center; border-radius: 5px } </style>
 <div style="width:100%" id="icons">
 <?php
   foreach($_['apps'] as $id => $obj) {
@@ -10,13 +10,13 @@
         .'. <input type="submit" value="Allow" onclick="addApp(\''
         .$obj['launch_url'].'\', \''
         .$obj['name'].'\', \''
-        .$_['scope_diff_add']['map'].'\');" /></p>';
+        .$_['scope_diff_add']['normalized'].'\');" /></p>';
     } else {
       echo '<div class="square">'
         . '<a href="' . $obj['launch_url']
         . '#remotestorage=' . urlencode($_['user_address'])
         . '&access_token=' . urlencode($obj['token'])
-        . '&scope=' . urlencode($obj['scope'])
+        . '&scope=' . urlencode($obj['scope']['normalized'])
         . '">'
         . '<img width="128px" height="128px" src="' . $obj['icon_url']
         . '">'
@@ -32,7 +32,7 @@
       .'. <input type="submit" value="Install" onclick="addApp(\''
       .$_['adding_launch_url'].'\', \''
       .$_['adding_name'].'\', \''
-      .$_['adding_scope']['map'].'\');" /></p>';
+      .$_['adding_scope']['normalized'].'\');" /></p>';
   }
 ?>
 </div>
@@ -66,8 +66,7 @@
   function addManifest() {
     var manifestUrl = document.getElementById('manifestUrl').value;
     ajax('addmanifest.php', {
-      manifest_url_dirty: manifestUrl,
-      scope_map: {}//requesting zero access at this point
+      manifest_url_dirty: manifestUrl
     }, function() {
      //window.location = '?';
     });

@@ -11,9 +11,9 @@
 // manifest_path string
 // scope_map     array( module => level )
 
-require('open_web_apps/lib/storage.php');
-require('open_web_apps/lib/apps.php');
-require('open_web_apps/lib/parser.php');
+require_once('open_web_apps/lib/storage.php');
+require_once('open_web_apps/lib/apps.php');
+require_once('open_web_apps/lib/parser.php');
 
 function fetchManifest($url) {
   $str = OC_Util::getUrlContent($url);

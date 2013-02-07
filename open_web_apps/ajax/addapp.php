@@ -12,8 +12,8 @@
 // name        string
 // scope_map   array( module => level )
 
-require('open_web_apps/lib/apps.php');
-require('open_web_apps/lib/parser.php');
+require_once('open_web_apps/lib/apps.php');
+require_once('open_web_apps/lib/parser.php');
 
 function handle() {
   try {
@@ -27,7 +27,8 @@ function handle() {
   OCP\JSON::callCheck();
   $urlObj = MyParser::parseUrl($params['launch_url']);
   $name = MyParser::cleanName($params['name']);
-  $token = MyApps::store($urlObj['id'], $urlObj['path'], $name, '/favicon.ico', $params['scope_map']);
+  $scope = MyParser::parseScope($params['scope']);
+  $token = MyApps::store($urlObj['id'], $urlObj['path'], $name, '/favicon.ico', $scope['map']);
   if($token) {
     OCP\JSON::success(array());
   } else {

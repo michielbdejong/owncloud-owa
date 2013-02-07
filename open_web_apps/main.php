@@ -23,8 +23,8 @@
 *
 */
 
-require_once 'lib/apps.php';
-require_once 'lib/parser.php';
+require_once 'open_web_apps/lib/apps.php';
+require_once 'open_web_apps/lib/parser.php';
 
 function getScope($token) {
 	try {
@@ -41,32 +41,6 @@ function getScope($token) {
 		$strs[] = $obj['module'].':'.$obj['level'];
 	}
 	return implode(' ', $strs);
-}
-function getApps($uid) {
-	try {
-		$stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*open_web_apps` WHERE `uid_owner` = ?' );
-		$result = $stmt->execute(array($uid));
-	} catch(Exception $e) {
-		OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
-		OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' uid: '.$uid, OCP\Util::DEBUG);
-		return false;
-	}
-	$appsFromDb = $result->fetchAll();
-        $apps = array();
-	foreach($appsFromDb as $app) {
-		$manifest = MyApps::getManifest($app['app_id']);
- 		if($manifest) {
-			$origin = MyParser::idToOrigin($app['app_id']);
-			$apps[$app['app_id']] = array(
-				'name' => $manifest['name'],
-				'launch_url' => MyParser::parseUrl($origin.$manifest['launch_path'])['clean'],
-				'icon_url' => MyParser::parseUrl($origin.$manifest['icons'][128])['clean'],//in JSON this is ['128']
-				'scope' => getScope($app['token']),
-				'token' => $app['token']
-			);
-		}
-	}
-	return $apps;
 }
 function calcScopeDiff($url, $scope) {
   $existingScope = $apps[$url]['scope'];
@@ -114,7 +88,7 @@ function checkForAdd($apps) {
 //...
 OCP\User::checkLoggedIn();
 $uid = OCP\USER::getUser();
-$apps = getApps($uid);
+$apps = MyApps::getApps($uid);
 $storage_origin = OCP\Config::getAppValue('open_web_apps',  "storage_origin", '' );
 OCP\App::setActiveNavigationEntry( 'open_web_apps' );
 $tmpl = new OCP\Template( 'open_web_apps', 'main', 'user' );

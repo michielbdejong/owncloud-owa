@@ -1,8 +1,35 @@
 <?php
 
 require_once('open_web_apps/lib/storage.php');
+require_once('open_web_apps/lib/parser.php');
 
 class MyApps {
+  public static function getApps($uid) {
+    try {
+      $stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*open_web_apps` WHERE `uid_owner` = ?' );
+      $result = $stmt->execute(array($uid));
+    } catch(Exception $e) {
+      OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
+      OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' uid: '.$uid, OCP\Util::DEBUG);
+      return false;
+    }
+    $appsFromDb = $result->fetchAll();
+    $apps = array();
+    foreach($appsFromDb as $app) {
+      $manifest = self::getManifest($app['app_id']);
+      if($manifest) {
+        $origin = MyParser::idToOrigin($app['app_id']);
+        $apps[$app['app_id']] = array(
+          'name' => $manifest['name'],
+          'launch_url' => MyParser::parseUrl($origin.$manifest['launch_path'])['clean'],
+          'icon_url' => MyParser::parseUrl($origin.$manifest['icons'][128])['clean'],//in JSON this is ['128']
+          'scope' => getScope($app['token']),
+          'token' => $app['token']
+        );
+      }
+    }
+    return $apps;
+  }
   public static function getManifest($id) {
     $ret = MyStorage::get(OCP\USER::getUser(), 'apps/'.$id.'/manifest.json');
     $manifest;
@@ -13,23 +40,49 @@ class MyApps {
     $manifest['disk'] = $ret;
     return $manifest;
   }
-  public static function store($id, $launchPath, $name, $icon, $scopeMap) {
-    $manifestPath = 'apps/'.$id.'/manifest.json';
-    $uid = OCP\USER::getUser();
-    $token = base64_encode(OC_Util::generate_random_bytes(40));
+  public static function getToken($uid, $id) {
     try {
-      $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*open_web_apps` (`uid_owner`, `app_id`, `access_token`) VALUES (?, ?, ?)' );
-      $result = $stmt->execute(array($uid, $id, $token));
+      $stmt = OCP\DB::prepare( 'SELECT `access_token` FROM `*PREFIX*open_web_apps` WHERE `uid_owner` = ? AND `app_id` = ?' );
+      $result = $stmt->execute(array($uid, $id));
     } catch(Exception $e) {
-      var_dump($e);
       OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
       OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' uid: '.$uid, OCP\Util::DEBUG);
       return false;
     }
+    $rows = $result->fetchAll();
+    if(count($rows) == 0) {
+      return null;
+    } else {
+      return $rows[0]['access_token'];
+    }
+  }
+  public static function store($id, $launchPath, $name, $icon, $scopeMap) {
+    $uid = OCP\USER::getUser();
+    $token = self::getToken($uid, $id);
+    if(!$token) {
+      $token = base64_encode(OC_Util::generate_random_bytes(40));
+      try {
+        $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*open_web_apps` (`uid_owner`, `app_id`, `access_token`) VALUES (?, ?, ?)' );
+        $result = $stmt->execute(array($uid, $id, $token));
+      } catch(Exception $e) {
+        var_dump($e);
+        OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
+        OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' uid: '.$uid, OCP\Util::DEBUG);
+        return false;
+      }
+      $manifestPath = 'apps/'.$id.'/manifest.json';
+      MyStorage::store($uid, $manifestPath, 'application/json', json_encode(array(
+        'launch_path' => $launchPath,
+        'name' => $name,
+        'icons' => array(
+          '128' => $icon
+        )
+      ), true));
+    }
     foreach($scopeMap as $module => $level) {
       try {
-       $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*remotestorage_access` (`access_token`, `module`, `level`) VALUES (?, ?, ?)' );
-        $result = $stmt->execute(array($token, $module, $level));
+       $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*remotestorage_access` (`uid_owner`, `access_token`, `module`, `level`) VALUES (?, ?, ?)' );
+        $result = $stmt->execute(array($uid, $token, $module, $level));
       } catch(Exception $e) {
         var_dump($e);
         OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
@@ -37,13 +90,6 @@ class MyApps {
         return false;
       }
     }
-    MyStorage::store($uid, $manifestPath, 'application/json', json_encode(array(
-      'launch_path' => $launchPath,
-      'name' => $name,
-      'icons' => array(
-        '128' => $icon
-      )
-    ), true));
     return $token;
   }
 }
