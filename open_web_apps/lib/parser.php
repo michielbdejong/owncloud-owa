@@ -28,7 +28,7 @@ class MyParser {
       return $str.' and '.$items[count($items)-1];
     }
   }
-  function parseUrl($dirty) {
+  public static function parseUrl($dirty) {
     $parts = explode('/', $dirty);
     if(count($parts)<4) {
       return array(null, null);
@@ -59,7 +59,7 @@ class MyParser {
       'path' => '/'.ereg_replace('[<\']', '', implode('/', array_slice($parts, 3)))
     );
   }
-  function parseScope($scope) {
+  public static function parseScope($scope) {
     $map = array();
     $parts = explode(' ', $scope);
     foreach($parts as $str) {
@@ -97,5 +97,11 @@ class MyParser {
       'normalized' => implode(' ', $reassembleParts),
       'human' => toHuman($map)
     );
+  }
+  public static function cleanName($dirty) {
+    return ereg_replace('[^a-zA-Z0-9%\-_\.]', '', $dirty); 
+  }
+  public static function cleanUrlPath($dirty) {
+    return ereg_replace('[^a-zA-Z0-9%\-_\.\/]', '', $dirty); 
   }
 }

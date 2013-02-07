@@ -66,7 +66,7 @@
     var manifestUrl = document.getElementById('manifestUrl').value;
     ajax('addmanifest.php', {
       manifestUrl: manifestUrl,
-      scope_map: $_['scope']['map']
+      scope_map: <?php echo json_encode($_['scope']['map']); ?>
     }, function() {
      //window.location = '?';
     });

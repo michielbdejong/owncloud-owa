@@ -11,14 +11,15 @@
 // manifest_path string
 // scope_map     array( module => level )
 
+require('open_web_apps/lib/storage.php');
 require('open_web_apps/lib/apps.php');
 require('open_web_apps/lib/parser.php');
 
 function fetchManifest($url) {
-  $str = Util::getUrlContent($url);
+  $str = OC_Util::getUrlContent($url);
   try {
     $obj = json_decode($str);
-  } catch(e) {
+  } catch(Exception $e) {
     OCP\JSON::error('manifest should be a JSON string please');
   }
   return array(
@@ -40,7 +41,7 @@ function handle() {
 
   $urlObj = MyParser::parseUrl($params['manifest_url_dirty'])['origin'];
   $manifestClean = fetchManifest($urlObj['clean']);
-  if($manifest) {
+  if($manifestClean) {
     if(MyApps::store($urlObj['origin'], $manifestClean['launch_path'], $manifestClean['name'], $manifestClean['icon'], $params['scope_map'])) {
       OCP\JSON::success(array('token'=> $token));
     } else {
