@@ -22,16 +22,15 @@
       . '<p>' . htmlentities($obj['name']) . '</p>'//TODO: there is probably a better way to escape the name field?
       . '</a> </div>';
   }
-  if($_['adding_origin']) {
+  if($_['adding_launch_url']) {
     echo '<div class="square" style="border-style:dotted">'
       . '<img width="128px" height="128px" src="">'
-      . '<p>' . htmlentities($_['adding_name_dirty']) . '</p>'//TODO: there is probably a better way to escape the name field?
+      . '<p>' . $_['adding_name_dirty'] . '</p>'//TODO: there is probably a better way to escape the name field?
       . '<p>wants '.$_['adding_scope']['human']
       .'. <input type="submit" value="Install" onclick="addApp(\''
-      .$_['adding_origin'].'\', \''
-      .$_['adding_launch_path'].'\', \''
-      .htmlentities($_['adding_name_dirty']).'\', \''
-      .$_['adding_url_scope']['map'].'\');" /></p></div>';
+      .$_['adding_launch_url'].'\', \''
+      .$_['adding_name'].'\', \''
+      .$_['adding_scope']['map'].'\');" /></p></div>';
   }
 ?>
 </div>
@@ -65,17 +64,16 @@
   function addManifest() {
     var manifestUrl = document.getElementById('manifestUrl').value;
     ajax('addmanifest.php', {
-      manifestUrl: manifestUrl,
-      scope_map: <?php echo json_encode($_['scope']['map']); ?>
+      manifest_url_dirty: manifestUrl,
+      scope_map: {}//requesting zero access at this point
     }, function() {
      //window.location = '?';
     });
   }
 
-  function addApp(origin, launchPath, name, scope) {
+  function addApp(launchUrl, name, scope) {
     ajax('addapp.php', {
-      origin: origin,
-      launch_path: launchPath,
+      launch_url: launchUrl,
       name: name,
       scope: scope
     }, function() {
@@ -85,7 +83,7 @@
 
   function removeApp(token) {
     ajax('removeapp.php', {
-      token: token
+      id: id
     }, function() {
      //window.location = '?';
     });

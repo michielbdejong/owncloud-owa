@@ -24,9 +24,11 @@ function handle() {
   OCP\JSON::checkLoggedIn();
   OCP\JSON::checkAppEnabled('open_web_apps');
   OCP\JSON::callCheck();
-
-  if(MyApps::store($params['origin'], $params['launch_path'], $params['name'], '/favicon.ico', $params['scope_map'])) {
-    OCP\JSON::success(array('token'=>$token));
+  $urlObj = MyParser::parseUrl($params['launch_url']);
+  $name = MyParser::cleanName($params['name']);
+  $token = MyApps::store($urlObj['id'], $urlObj['path'], $name, '/favicon.ico', $params['scope_map']);
+  if($token) {
+    OCP\JSON::success(array());
   } else {
     OCP\JSON::failure(array());
   }

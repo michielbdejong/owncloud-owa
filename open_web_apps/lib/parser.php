@@ -52,12 +52,15 @@ class MyParser {
     } else {
       return array();
     }
-    return array(
+    $ret = array(
       'protocol' => $protocol,
       'host' => $hostName,
       'port' => $hostPort,
-      'path' => '/'.ereg_replace('[<\']', '', implode('/', array_slice($parts, 3)))
+      'path' => '/'.ereg_replace('[<\']', '', implode('/', array_slice($parts, 3))),
     );
+    $ret['id'] = $ret['protocol'].'_'.$ret['host'].'_'.$ret['port'];
+    $ret['clean'] = $ret['protocol'].'://'.$ret['host'].':'.$ret['port'].$ret['path'];
+    return $ret;
   }
   public static function parseScope($scope) {
     $map = array();
