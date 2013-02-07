@@ -24,6 +24,7 @@
 */
 
 require_once 'lib/storage.php';
+require_once 'lib/parser.php';
 
 function getScope($token) {
 	try {
@@ -71,97 +72,6 @@ function getApps($uid) {
 	}
 	return $apps;
 }
-
-function toHuman($map) {
-  $items = array();
-  foreach($map as $module => $level) {
-    if($module == 'root') {
-      $thing = 'everything';
-    } else {
-      $thing = 'your '.$module;
-    }
-    if($level == 'r') {
-      $items[] = 'read-only access to '.$thing;
-    } else {
-      $items[] = 'full access to '.$thing;
-    }
-  }
-  if(count($items) == 0) {
-    return 'no access to anything';
-  } else if(count($items) == 1) {
-    return $items[0];
-  } else if(count($items) == 2) {
-    return $items[0].' and '.$items[1];
-  } else {
-    $str = '';
-    for($i = 0; $i<count($items)-1; $i++) {
-      $str .= $items[$i].', ';
-    }
-    return $str.' and '.$items[count($items)-1];
-  }
-}
-function parseRedirectUri($dirty) {
-  $parts = explode('/', $dirty);
-  if(count($parts)<4) {
-    return array(null, null);
-  }
-  if($parts[0] == 'http:') {
-    $protocol = 'http';
-  } else if($parts[0] == 'https:') {
-    $protocol = 'https';
-  } else {
-    return array(null, null);
-  }
-  if($parts[1] != '') {
-    return array(null, null);
-  }
-  $hostParts = explode(':', $parts[2]);
-  $hostName = ereg_replace('[^a-zA-Z0-9\-\.]', '', $hostParts[0]);
-  $hostPort = ereg_replace('[^0-9]', '', $hostParts[1]);
-  return array(
-    $protocol.'_'.$hostName.'_'.$hostPort,
-    '/'.ereg_replace('[<\']', '', implode('/', array_slice($parts, 3)))
-  );
-}
-function parseScope($scope) {
-  $map = array();
-  $parts = explode(' ', $scope);
-  foreach($parts as $str) {
-    $moduleAndLevel = explode(':', $str);
-    if(count($moduleAndLevel)==2 && in_array($moduleAndLevel[1], array('r', 'rw'))) {
-      //https://tools.ietf.org/id/draft-dejong-remotestorage-00.txt, section 4:
-      //Item names MAY contain a-z, A-Z, 0-9, %,  -, _.
-      //Note: we should allow '.' too in remotestorage-01.
-      //Allowing it here as an intentional violation:
-      $moduleName = ereg_replace('[^a-zA-Z0-9%\-_\.]', '', $moduleAndLevel[0]); 
-      if(strlen($moduleName)>0 && $map[$moduleName] != 'rw') {//take the strongest one
-        $map[$moduleName] = $moduleAndLevel[1];
-      }
-    }
-  }
-  //root:rw is almighty and cannot coexist with other scopes:
-  if($map['root'] == 'rw') {
-    $map = array('root' => 'rw');
-  }
-  //root:r cannot coexist with other 'r' scopes:
-  if($map['root'] == 'r') {
-    foreach($map as $module => $level) {
-      if($module != 'root' && $level == 'r') {
-        unset($map[$module]);
-      }
-    }
-  }
-  $reassembleParts = array();
-  foreach($map as $module => $level) {
-    $reassembleParts[] = $module.':'.$level;
-  }
-  sort($reassembleParts);
-  return array(
-    'map' => $map,
-    'normalized' => implode(' ', $reassembleParts),
-    'human' => toHuman($map)
-  );
-}
 function calcScopeDiv($url, $scope) {
   $existingScope = $apps[$url]['scope'];
   $newScope = parseScope($existingScope.' '.$scope);
@@ -182,20 +92,21 @@ function checkForAdd() {
     }
   }
   if($params['redirect_uri'] && $params['scope']) {
-    list($origin, $launchPath) = parseRedirectUri($params['redirect_uri']);
-    if($apps[$origin]) {
-      $scopeDiff = calcScopeDiff($origin, $params['scope']);
+    $urlObj = MyParser::parse($params['redirect_uri']);
+    $appId = $urlObj['protocol'].'_'.$urlObj['host'].'_'.$urlObj['port'];
+    if($apps[$appId]) {
+      $scopeDiff = calcScopeDiff($appId, $params['scope']);
       if($scopeDiff) {
         return array(
-	  'scope_diff_origin' => $origin,
+	  'scope_diff_id' => $appId,
           'scope_diff_add' => $scopeDiff
         );
       } else {
-        return array( 'launch_app' => $origin );
+        return array( 'launch_app' => $appId );
       }
     } else {
       return array(
-        'adding_origin' => $origin,
+        'adding_id' => $appId,
         'adding_launch_path' => $launchPath,
         'adding_name_dirty' => $params['client_id'],
         'adding_scope' => parseScope($params['scope'])//scope.normalized and scope.human will only contain [a-zA-Z0-9%\-_\.] and spaces

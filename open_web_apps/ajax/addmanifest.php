@@ -7,13 +7,26 @@
  */
 
 //params:
-// origin      string
-// launch_path string
-// name        string
-// scope       array( module => level )
+// origin        string
+// manifest_path string
+// scope_map     array( module => level )
 
 require('open_web_apps/lib/apps.php');
+require('open_web_apps/lib/parser.php');
 
+function fetchManifest($url) {
+  $str = Util::getUrlContent($url);
+  try {
+    $obj = json_decode($str);
+  } catch(e) {
+    OCP\JSON::error('manifest should be a JSON string please');
+  }
+  return array(
+    'name' => MyParser::cleanName($obj['name']),
+    'icon' => MyParser::cleanUrlPath($obj['icons']['128']),
+    'launch_path' => MyParser::cleanUrlPath($obj['launch_path'])
+  );
+}
 function handle() {
   try {
     $params = json_decode(file_get_contents('php://input'), true);
@@ -25,10 +38,16 @@ function handle() {
   OCP\JSON::checkAppEnabled('open_web_apps');
   OCP\JSON::callCheck();
 
-  if(MyApps::store($params['origin'], $params['launch_path'], $params['name'], '/favicon.ico', $params['scope_map'])) {
-    OCP\JSON::success(array('token'=>$token));
+  $urlObj = MyParser::parseUrl($params['manifest_url_dirty'])['origin'];
+  $manifestClean = fetchManifest($urlObj['clean']);
+  if($manifest) {
+    if(MyApps::store($urlObj['origin'], $manifestClean['launch_path'], $manifestClean['name'], $manifestClean['icon'], $params['scope_map'])) {
+      OCP\JSON::success(array('token'=> $token));
+    } else {
+      OCP\JSON::error('adding failed');
+    }
   } else {
-    OCP\JSON::failure(array());
+    OCP\JSON::error('fetching failed');
   }
 }
 handle();

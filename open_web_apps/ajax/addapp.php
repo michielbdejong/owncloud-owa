@@ -10,7 +10,7 @@
 // origin      string
 // launch_path string
 // name        string
-// scope       array( module => level )
+// scope_map   array( module => level )
 
 require('open_web_apps/lib/apps.php');
 
