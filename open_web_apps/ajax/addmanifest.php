@@ -6,7 +6,13 @@
  * See the COPYING-README file.
  */
 
-require_once 'open_web_apps/lib/storage.php';
+//params:
+// origin      string
+// launch_path string
+// name        string
+// scope       array( module => level )
+
+require('open_web_apps/lib/apps.php');
 
 function handle() {
   try {
@@ -19,15 +25,10 @@ function handle() {
   OCP\JSON::checkAppEnabled('open_web_apps');
   OCP\JSON::callCheck();
 
-  $uid = OCP\USER::getUser();
-  MyStorage::store($uid, $params['manifest_path'], 'application/json', json_encode(array(
-    'origin' => $params['origin'],
-    'launch_path' => $params['launch_path'],
-    'name' => $params['name'],
-    'icons' => ($params['icons']?$params['icons']['128']?array(
-       128 => $params['icons']['128']
-    ):array():array())
-  )));    
-  OCP\JSON::success(array('token'=>$token));
+  if(MyApps::store($params['origin'], $params['launch_path'], $params['name'], '/favicon.ico', $params['scope_map'])) {
+    OCP\JSON::success(array('token'=>$token));
+  } else {
+    OCP\JSON::failure(array());
+  }
 }
 handle();

@@ -12,7 +12,7 @@
 // name        string
 // scope       array( module => level )
 
-require('open_web_apps/lib/storage.php');
+require('open_web_apps/lib/apps.php');
 
 function handle() {
   try {
@@ -25,35 +25,10 @@ function handle() {
   OCP\JSON::checkAppEnabled('open_web_apps');
   OCP\JSON::callCheck();
 
-  $manifestPath = 'apps/'.$params['name'].'/manifest.json';
-
-  $uid = OCP\USER::getUser();
-  $token = base64_encode(OC_Util::generate_random_bytes(40));
-  try {
-    $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*open_web_apps` (`uid_owner`, `manifest_path`, `access_token`) VALUES (?, ?, ?)' );
-    $result = $stmt->execute(array($uid, $manifestPath, $token));
-  } catch(Exception $e) {
-    var_dump($e);
-    OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
-    OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' uid: '.$uid, OCP\Util::DEBUG);
-    return false;
+  if(MyApps::store($params['origin'], $params['launch_path'], $params['name'], '/favicon.ico', $params['scope_map'])) {
+    OCP\JSON::success(array('token'=>$token));
+  } else {
+    OCP\JSON::failure(array());
   }
-  foreach($params['scope'] as $module => $level) {
-    try {
-      $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*remotestorage_access` (`access_token`, `module`, `level`) VALUES (?, ?, ?)' );
-      $result = $stmt->execute(array($token, $module, $level));
-    } catch(Exception $e) {
-      var_dump($e);
-      OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
-      OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' uid: '.$uid, OCP\Util::DEBUG);
-      return false;
-    }
-  }
-  MyStorage::store($uid, $manifestPath, 'application/json', json_encode(array(
-    'origin' => $params['origin'],
-    'launch_path' => $params['launch_path'],
-    'name' => $params['name']
-  ), true));
-  OCP\JSON::success(array('token'=>$token));
 }
 handle();

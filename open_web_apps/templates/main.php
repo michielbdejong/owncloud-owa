@@ -31,7 +31,7 @@
       .$_['adding_origin'].'\', \''
       .$_['adding_launch_path'].'\', \''
       .htmlentities($_['adding_name_dirty']).'\', \''
-      .$_['adding_url_scope']['normalized'].'\');" /></p></div>';
+      .$_['adding_url_scope']['map'].'\');" /></p></div>';
   }
 ?>
 </div>
