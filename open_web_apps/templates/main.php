@@ -1,35 +1,38 @@
 <style> .square { border-style: solid; border-width: 2px; float: left; width: 160px; height: 160px; display: block; overflow: hidden; text-align: center; border-radius: 5px } </style>
 <div style="width:100%" id="icons">
 <?php
-  foreach($_['apps'] as $origin => $obj) {
-    $originParts = explode('_', $origin);
-    if(count($originParts)==3) {
-      $port = ':'.$originParts[2];
-    } else if(count($originParts)==2) {
-      $port = '';
+  foreach($_['apps'] as $id => $obj) {
+    if($_['scope_diff_id']==$id) {
+      echo '<div class="square" style="border-style:dotted">'
+        . '<img width="128px" height="128px" src="'.$obj['icon_url'].'">'
+        . '<p>' . $obj['name'] . '</p></div>'
+        . '<p>wants '.$_['scope_diff_add']['human']
+        .'. <input type="submit" value="Allow" onclick="addApp(\''
+        .$obj['launch_url'].'\', \''
+        .$obj['name'].'\', \''
+        .$_['scope_diff_add']['map'].'\');" /></p>';
     } else {
-      continue;
+      echo '<div class="square">'
+        . '<a href="' . $obj['launch_url']
+        . '#remotestorage=' . urlencode($_['user_address'])
+        . '&access_token=' . urlencode($obj['token'])
+        . '&scope=' . urlencode($obj['scope'])
+        . '">'
+        . '<img width="128px" height="128px" src="' . $obj['icon_url']
+        . '">'
+        . '<p>' . $obj['name'] . '</p>'
+        . '</a> </div>';
     }
-    echo '<div class="square">'
-      . '<a href="' . $originParts[0].'://'.$originParts[1].$port . $obj['launch_path']
-      . '#remotestorage=' . urlencode($_['user_address'])
-      . '&access_token=' . urlencode($obj['token'])
-      . '&scope=' . urlencode($obj['scope'])
-      . '">'
-      . '<img width="128px" height="128px" src="' . $obj['icon_url']
-      . '">'
-      . '<p>' . htmlentities($obj['name']) . '</p>'//TODO: there is probably a better way to escape the name field?
-      . '</a> </div>';
   }
   if($_['adding_launch_url']) {
     echo '<div class="square" style="border-style:dotted">'
       . '<img width="128px" height="128px" src="">'
-      . '<p>' . $_['adding_name_dirty'] . '</p>'//TODO: there is probably a better way to escape the name field?
+      . '<p>' . $_['adding_name'] . '</p></div>'
       . '<p>wants '.$_['adding_scope']['human']
       .'. <input type="submit" value="Install" onclick="addApp(\''
       .$_['adding_launch_url'].'\', \''
       .$_['adding_name'].'\', \''
-      .$_['adding_scope']['map'].'\');" /></p></div>';
+      .$_['adding_scope']['map'].'\');" /></p>';
   }
 ?>
 </div>

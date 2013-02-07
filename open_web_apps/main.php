@@ -68,7 +68,7 @@ function getApps($uid) {
 	}
 	return $apps;
 }
-function calcScopeDiv($url, $scope) {
+function calcScopeDiff($url, $scope) {
   $existingScope = $apps[$url]['scope'];
   $newScope = MyParser::parseScope($existingScope.' '.$scope);
   if($newScope['normalized'] == $existingScope) {
