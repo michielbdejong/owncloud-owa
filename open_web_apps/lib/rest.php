@@ -10,16 +10,16 @@ require_once 'storage.php';
 require_once 'auth.php';
 
 class MyRest {
-  private static parsePath($path) {
+  private static function parsePath($path) {
     $underPublic = false;
-    if(substring($path, 0, strlen('public/')) == 'public/') {
-      $path = substring($path, strlen('public/'));
+    if(substr($path, 0, strlen('public/')) == 'public/') {
+      $path = substr($path, strlen('public/'));
       $underPublic = true;
     }
     if($path == '') {
       return array(
-        'modules': array('root'),
-        'under_public': $underPublic
+        'modules' => array('root'),
+        'under_public' => $underPublic
       );
     } else {
       $parts = explode('/', $path);
@@ -27,8 +27,8 @@ class MyRest {
         return false;//empty module name not permitted
       } else {
         return array(
-          'modules': array('root', $parts[0]),
-          'under_public': $underPublic
+          'modules' => array('root', $parts[0]),
+          'under_public' => $underPublic
         );
       }
     }

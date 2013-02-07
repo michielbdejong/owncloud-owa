@@ -96,15 +96,7 @@ class MyApps {
       ), true));
     }
     foreach($scopeMap as $module => $level) {
-      try {
-       $stmt = OCP\DB::prepare( 'INSERT INTO `*PREFIX*remotestorage_access` (`uid_owner`, `access_token`, `module`, `level`) VALUES (?, ?, ?, ?)' );
-        $result = $stmt->execute(array($uid, $token, $module, $level));
-      } catch(Exception $e) {
-        var_dump($e);
-        OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
-        OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' uid: '.$uid, OCP\Util::DEBUG);
-        return false;
-      }
+      MyAuth::giveAccess($token, $uid, $module, $level);
     }
     return $token;
   }
