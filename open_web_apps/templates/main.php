@@ -1,4 +1,4 @@
-<?php var_dump($_); ?><style> .square { border-style: solid; border-width: 2px; float: left; width: 160px; height: 160px; display: block; overflow: hidden; text-align: center; border-radius: 5px } </style>
+<style> .square { border-style: solid; border-width: 2px; float: left; width: 160px; height: 160px; display: block; overflow: hidden; text-align: center; border-radius: 5px } </style>
 <div style="width:100%" id="icons">
 <?php
   foreach($_['apps'] as $id => $obj) {

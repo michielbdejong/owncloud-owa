@@ -26,22 +26,6 @@
 require_once 'open_web_apps/lib/apps.php';
 require_once 'open_web_apps/lib/parser.php';
 
-function getScope($token) {
-	try {
-		$stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*remotestorage_access` WHERE `access_token` = ?' );
-		$result = $stmt->execute(array($token));
-	} catch(Exception $e) {
-		OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
-		OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' token: '.$token, OCP\Util::DEBUG);
-		return false;
-	}
-	$scopesFromDb = $result->fetchAll();
-        $strs = array();
-	foreach($scopesFromDb as $obj) {
-		$strs[] = $obj['module'].':'.$obj['level'];
-	}
-	return implode(' ', $strs);
-}
 function calcScopeDiff($url, $scope) {
   $existingScope = $apps[$url]['scope'];
   $newScope = MyParser::parseScope($existingScope.' '.$scope);

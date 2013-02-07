@@ -4,6 +4,22 @@ require_once('open_web_apps/lib/storage.php');
 require_once('open_web_apps/lib/parser.php');
 
 class MyApps {
+  public static function getScope($token) {
+    try {
+      $stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*remotestorage_access` WHERE `access_token` = ?' );
+      $result = $stmt->execute(array($token));
+    } catch(Exception $e) {
+      OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' exception: '.$e->getMessage(), OCP\Util::ERROR);
+      OCP\Util::writeLog('open_web_apps', __CLASS__.'::'.__METHOD__.' token: '.$token, OCP\Util::DEBUG);
+      return false;
+    }
+    $scopesFromDb = $result->fetchAll();
+    $strs = array();
+    foreach($scopesFromDb as $obj) {
+      $strs[] = $obj['module'].':'.$obj['level'];
+    }
+    return implode(' ', $strs);
+  }
   public static function getApps($uid) {
     try {
       $stmt = OCP\DB::prepare( 'SELECT * FROM `*PREFIX*open_web_apps` WHERE `uid_owner` = ?' );
@@ -23,8 +39,8 @@ class MyApps {
           'name' => $manifest['name'],
           'launch_url' => MyParser::parseUrl($origin.$manifest['launch_path'])['clean'],
           'icon_url' => MyParser::parseUrl($origin.$manifest['icons'][128])['clean'],//in JSON this is ['128']
-          'scope' => getScope($app['token']),
-          'token' => $app['token']
+          'scope' => self::getScope($app['access_token']),
+          'token' => $app['access_token']
         );
       }
     }
