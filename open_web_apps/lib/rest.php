@@ -53,15 +53,13 @@ class MyRest {
   }
   static function HandleRequest($verb, $uid, $path, $headers, $body) {
     if($verb == 'GET') {
-      if(self::may($action, $uid, $path, $headers)) {
+      if(self::may((self::isDir($path)?'l':'r'), $uid, $path, $headers)) {
         if(self::isDir($path)) {
-          $action = 'l';
           $obj = array(
             'mimeType' => 'application/json',
             'content' => json_encode(MyStorage::getDir($uid, $path))
           );
         } else {
-          $action = 'r';
           $obj = MyStorage::get($uid, $path);
         }
         if($obj['mimeType']) {
