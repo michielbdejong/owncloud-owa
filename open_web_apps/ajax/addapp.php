@@ -13,6 +13,7 @@
 // scope_map   array( module => level )
 
 require_once('open_web_apps/lib/apps.php');
+require_once('open_web_apps/lib/auth.php');
 require_once('open_web_apps/lib/parser.php');
 
 function handle() {

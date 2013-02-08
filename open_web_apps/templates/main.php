@@ -24,7 +24,7 @@
         . '</a> </div>';
     }
   }
-  if($_['adding_launch_url']) {
+  if($_['adding_id']) {
     echo '<div class="square" style="border-style:dotted">'
       . '<img width="128px" height="128px" src="">'
       . '<p>' . $_['adding_name'] . '</p></div>'
@@ -68,7 +68,7 @@
     ajax('addmanifest.php', {
       manifest_url_dirty: manifestUrl
     }, function() {
-     //window.location = '?';
+     window.location = '?';
     });
   }
 
@@ -78,7 +78,7 @@
       name: name,
       scope: scope
     }, function() {
-     //window.location = '?';
+     window.location = '?';
     });
   }
 
@@ -86,7 +86,7 @@
     ajax('removeapp.php', {
       id: id
     }, function() {
-     //window.location = '?';
+     window.location = '?';
     });
   }
 </script>

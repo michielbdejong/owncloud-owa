@@ -26,13 +26,12 @@
 require_once 'open_web_apps/lib/apps.php';
 require_once 'open_web_apps/lib/parser.php';
 
-function calcScopeDiff($url, $scope) {
-  $existingScope = $apps[$url]['scope'];
-  $newScope = MyParser::parseScope($existingScope.' '.$scope);
-  if($newScope['normalized'] == $existingScope) {
+function calcScopeDiff($existingScope, $addingScope) {
+  $newScopeObj = MyParser::parseScope($existingScope.' '.$addingScope);
+  if($newScopeObj['normalized'] == $existingScope) {
     return false;
   } else {
-    return $newScope;
+    return $newScopeObj;
   }
 }
 
@@ -49,7 +48,7 @@ function checkForAdd($apps) {
     $urlObj = MyParser::parseUrl($params['redirect_uri']);
     $appId = $urlObj['id'];
     if($apps[$appId]) {
-      $scopeDiff = calcScopeDiff($appId, $params['scope']);
+      $scopeDiff = calcScopeDiff($apps[$appId]['scope'], $params['scope']);
       if($scopeDiff) {
         return array(
 	  'scope_diff_id' => $appId,
@@ -61,8 +60,8 @@ function checkForAdd($apps) {
     } else {
       return array(
         'adding_id' => $appId,
-        'adding_launch_path' => $launchPath,
-        'adding_name_dirty' => $params['client_id'],
+        'adding_launch_url' => $urlObj['clean'],
+        'adding_name' => MyParser::cleanName($params['client_id']),
         'adding_scope' => MyParser::parseScope($params['scope'])//scope.normalized and scope.human will only contain [a-zA-Z0-9%\-_\.] and spaces
       );
     }
