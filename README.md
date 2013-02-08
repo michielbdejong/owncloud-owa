@@ -16,11 +16,12 @@ These instructions assume standard install with apache2 on a debian-like system.
 * copy the 'webfinger' file to /var/www/.well-known/webfinger
 * assuming there are no files other than 'webfinger' in that directory, then in /etc/apache2/sites-enabled/default-ssl, add:
 
+````
     <Directory /var/www/.well-known/>
        Header set Access-Control-Allow-Origin "*"
        Header set Content-Type "application/json"
     </Directory>
-
+````
 * sudo service apache2 restart
 * log in to owncloud as an admin and activate the app
 * configure the storage origin in the owncloud admin settings
