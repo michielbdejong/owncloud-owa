@@ -6,7 +6,7 @@ This owncloud app lets you add open web apps to your owncloud instance.
 
 These instructions assume standard install with apache2 on a debian-like system.
 
-* First, install owncloud as normal. 
+* First, install owncloud 4.5 (*not* owncloud 5.0 or higher) as normal. 
 * Copy the open\_web\_apps folder into /var/www/apps/
 * choose a storage origin. This can be an additional subdomain, or an additional port on which Apache should listen, like https://example.com:44344
 * add this origin as an additional vhost to apache config and point it to /var/www/apps/open\_web\_apps/storage\_root/
@@ -30,9 +30,11 @@ These instructions assume standard install with apache2 on a debian-like system.
 
 # Known Bugs
 
-* install is still very cumbersome
-* it doesn't warn if you forget to configure the storage origin
 * there is no way to remove apps (other than going into the database)
+* install is still very cumbersome
+* not ported to owncloud 5.0 yet
+* it doesn't warn if you forget to configure the storage origin
+* it sends out cookies on the storage origin (probably harmless though)
 
 # license
 
