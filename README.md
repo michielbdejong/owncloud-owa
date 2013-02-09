@@ -35,6 +35,9 @@ These instructions assume standard install with apache2 on a debian-like system.
 * not ported to owncloud 5.0 yet
 * it doesn't warn if you forget to configure the storage origin
 * it sends out cookies on the storage origin (probably harmless though)
+* /index.php?app=open\_web\_apps&getfile=main.php sometimes incorrectly redirects to /open\_web\_apps/index.php
+* expanding permissions to more scopes causes existing ones to be repeated in the database
+* it sometimes serves Content-Type 1 instead of what's in xattr.
 
 # license
 
