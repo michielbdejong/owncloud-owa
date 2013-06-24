@@ -32,7 +32,7 @@ ini_set('memory_limit', "1024M");
 
 $requiredOrigin = OCP\Config::getAppValue('open_web_apps',  "storage_origin", '' );//set the storage origin to something else than the owncloud admin interface origin to avoid xss vulnz.
 if(($_SERVER['HTTPS']?'https://':'http://').$_SERVER['HTTP_HOST'] != $requiredOrigin) {
-  die('please visit on '.$requiredOrigin);
+  die('please visit on '.$requiredOrigin.' not '.($_SERVER['HTTPS']?'https://':'http://').$_SERVER['HTTP_HOST']);
 }
 
 $verb = $_SERVER['REQUEST_METHOD'];

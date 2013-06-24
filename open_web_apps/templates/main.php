@@ -37,7 +37,7 @@
 ?>
 </div>
 <div style=" clear: left ">
-  Manifest: <input id="manifestUrl" value="http://music.michiel.5apps.com/michiel_music.webapp" style="width:20em" />
+  Manifest: <input id="manifestUrl" value="https://music-michiel.5apps.com/michiel_music.webapp" style="width:20em" />
   <input type="submit" value="add manifest" onclick="addManifest();" />
 </div>
 <script>

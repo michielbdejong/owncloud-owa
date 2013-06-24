@@ -1,11 +1,11 @@
 {
   "links":[{
-    "href": "https://example.com:44344/?user=admin&path=",
+    "href": "http://storage.freedombox/?user=admin&path=",
     "rel": "remotestorage",
-    "type": "remotestorage-00",
+    "type": "draft-dejong-remotestorage-01",
     "properties": {
-      "auth-method": "https://tools.ietf.org/html/draft-ietf-oauth-v2-26#section-4.2",
-      "auth-endpoint": "https://example.com/index.php?app=open_web_apps&getfile=main.php"
+      "http://tools.ietf.org/html/rfc6749#section-4.2": "http://localhost/index.php?app=open_web_apps&getfile=main.php",
+      "auth-endpoint": "http://localhost/index.php?app=open_web_apps&getfile=main.php"
     }
  }]
 }
