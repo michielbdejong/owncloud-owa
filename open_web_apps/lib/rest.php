@@ -63,7 +63,8 @@ class MyRest {
           $obj = MyStorage::get($uid, $path);
         }
         if($obj['mimeType']) {
-          return array(200, array('Content-Type' => $obj['mimeType'], 'Last-Modified' => $obj['timestamp']), $obj['content']);
+          //todo: check for If-None-Match header
+          return array(200, array('Content-Type' => $obj['mimeType'], 'ETag' => $obj['timestamp'].toString()), $obj['content']);
         } else {
           return array(404, array(), 'Not found');
         }
@@ -75,8 +76,9 @@ class MyRest {
         return array(401, array(), 'Computer says no');
       } else {
         if(self::may('w', $uid, $path, $headers)) {
+          //todo: check for If-Match header
           $timestamp = MyStorage::store($uid, $path, self::getMimeType($headers), $body);
-         return array(200, array('Last-Modified' => $timestamp), '');
+         return array(200, array('ETag' => $timestamp.toString()), '');
          } else {
           return array(401, array(), 'Computer says no');
         }
@@ -88,7 +90,8 @@ class MyRest {
         if(self::may('d', $uid, $path, $headers)) {
           $timestamp = MyStorage::remove($uid, $path, self::getMimeType($headers));
           if($timestamp) {
-            return array(200, array('Last-Modified' => $timestamp), '');
+            //todo: check for If-Match header
+            return array(200, array('ETag' => $timestamp.toString()), '');
           } else {
             return array(404, array(), 'Not found');
           }
