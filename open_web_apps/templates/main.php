@@ -7,13 +7,11 @@
         . '<img width="128px" height="128px" src="'.$obj['icon_url'].'">'
         . '<p>' . $obj['name'] . '</p></div>'
         . '<p>wants '.$_['scope_diff_add']['human']
-        .'. <input type="submit" value="Allow" id="allowApp'.$id.' /></p>'
-        .'<script>document.getElementById("allowApp'.$id.'").onclick = function() {'
-        .'  addApp(\''
-        .$obj['launch_url'].'\', \''
-        .$obj['name'].'\', \''
-        .$_['scope_diff_add']['normalized'].'\');'
-        .'}</script>';
+        .'. <input type="submit" value="Allow" id="allowBtn"'
+        .'  data-launch-url="'.$obj['launch_url'].'"'
+        .'  data-name="'.$obj['name'].'"'
+        .'  data-scope="'.$_['scope_diff_add']['normalized'].'"'
+        .' /></p>';
     } else {
       echo '<div class="square">'
         . '<a href="' . $obj['launch_url']
@@ -32,67 +30,16 @@
       . '<img width="128px" height="128px" src="">'
       . '<p>' . $_['adding_name'] . '</p></div>'
       . '<p>wants '.$_['adding_scope']['human']
-      .'. <input type="submit" value="Install" id="installApp'.$id.' /></p>'
-        .'<script>document.getElementById("installApp'.$id.'").onclick = function() {'
-        .'  addApp(\''
-        .$_['adding_launch_url'].'\', \''
-        .$_['adding_name'].'\', \''
-        .$_['adding_scope']['normalized'].'\');'
-        .'}</script>';
+      .'. <input type="submit" value="Install" id="allowBtn"'
+        .'  data-launch-url="'.$_['adding_launch_url'].'"'
+        .'  data-name="'.$_['adding_name'].'"'
+        .'  data-scope="'.$_['adding_scope']['normalized'].'"'
+      .' /></p>';
   }
 ?>
 </div>
 <div style=" clear: left ">
   Manifest: <input id="manifestUrl" value="https://music-michiel.5apps.com/michiel_music.webapp" style="width:20em" />
-  <input type="submit" value="add manifest" onclick="addManifest();" />
+  <input type="submit" value="add manifest" id="addManifestBtn" />
 </div>
-<script>
-  function ajax(endpoint, params, cb) {
-    var xhr = new XMLHttpRequest();
-    var path = '/?app=open_web_apps&getfile=ajax/'+endpoint;
-    xhr.open('POST', path, true);
-    xhr.onreadystatechange = function() {
-      if(xhr.readyState == 4) {
-        if(xhr.status==200) {
-          result = {
-            contentType: xhr.getResponseHeader('Content-Type'),
-            content: xhr.responseText
-          };
-          cb(null, result);
-        } else {
-          console.log('ajax fail 3');
-          cb(xhr.status);
-        }
-      }
-    };
-    xhr.setRequestHeader('requesttoken', oc_requesttoken);
-    xhr.send(JSON.stringify(params));
-  }
-
-  function addManifest() {
-    var manifestUrl = document.getElementById('manifestUrl').value;
-    ajax('addmanifest.php', {
-      manifest_url_dirty: manifestUrl
-    }, function() {
-     window.location = '';
-    });
-  }
-
-  function addApp(launchUrl, name, scope) {
-    ajax('addapp.php', {
-      launch_url: launchUrl,
-      name: name,
-      scope: scope
-    }, function() {
-     window.location = '';
-    });
-  }
-
-  function removeApp(token) {
-    ajax('removeapp.php', {
-      id: id
-    }, function() {
-     window.location = '';
-    });
-  }
-</script>
+<script src="/apps/open_web_apps/js/main.js"></script>
