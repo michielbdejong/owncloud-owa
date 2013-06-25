@@ -7,10 +7,13 @@
         . '<img width="128px" height="128px" src="'.$obj['icon_url'].'">'
         . '<p>' . $obj['name'] . '</p></div>'
         . '<p>wants '.$_['scope_diff_add']['human']
-        .'. <input type="submit" value="Allow" onclick="addApp(\''
+        .'. <input type="submit" value="Allow" id="allowApp'.$id.' /></p>'
+        .'<script>document.getElementById("allowApp'.$id.'").onclick = function() {'
+        .'  addApp(\''
         .$obj['launch_url'].'\', \''
         .$obj['name'].'\', \''
-        .$_['scope_diff_add']['normalized'].'\');" /></p>';
+        .$_['scope_diff_add']['normalized'].'\');'
+        .'}</script>';
     } else {
       echo '<div class="square">'
         . '<a href="' . $obj['launch_url']
@@ -29,10 +32,13 @@
       . '<img width="128px" height="128px" src="">'
       . '<p>' . $_['adding_name'] . '</p></div>'
       . '<p>wants '.$_['adding_scope']['human']
-      .'. <input type="submit" value="Install" onclick="addApp(\''
-      .$_['adding_launch_url'].'\', \''
-      .$_['adding_name'].'\', \''
-      .$_['adding_scope']['normalized'].'\');" /></p>';
+      .'. <input type="submit" value="Install" id="installApp'.$id.' /></p>'
+        .'<script>document.getElementById("installApp'.$id.'").onclick = function() {'
+        .'  addApp(\''
+        .$_['adding_launch_url'].'\', \''
+        .$_['adding_name'].'\', \''
+        .$_['adding_scope']['normalized'].'\');'
+        .'}</script>';
   }
 ?>
 </div>
