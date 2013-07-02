@@ -56,6 +56,7 @@ class MyRest {
       if(self::may((self::isDir($path)?'l':'r'), $uid, $path, $headers)) {
         if(self::isDir($path)) {
           $obj = array(
+            'timestamp' => 0,
             'mimeType' => 'application/json',
             'content' => json_encode(MyStorage::getDir($uid, $path))
           );
@@ -64,7 +65,7 @@ class MyRest {
         }
         if($obj['mimeType']) {
           //todo: check for If-None-Match header
-          return array(200, array('Content-Type' => $obj['mimeType'], 'ETag' => $obj['timestamp'].toString()), $obj['content']);
+          return array(200, array('Content-Type' => $obj['mimeType'], 'ETag' => strval($obj['timestamp'])), $obj['content']);
         } else {
           return array(404, array(), 'Not found');
         }
