@@ -73,17 +73,17 @@ class MyParser {
         //Note: we should allow '.' too in remotestorage-01.
         //Allowing it here as an intentional violation:
         $moduleName = preg_replace('#[^a-zA-Z0-9%\-_\.]#i', '', $moduleAndLevel[0]); 
-        if(strlen($moduleName)>0 && $map[$moduleName] != 'rw') {//take the strongest one
+        if(strlen($moduleName)>0 && (!isset($map[$moduleName]) || $map[$moduleName] == 'r')) {//take the strongest one
           $map[$moduleName] = $moduleAndLevel[1];
         }
       }
     }
     //root:rw is almighty and cannot coexist with other scopes:
-    if($map['root'] == 'rw') {
+    if(isset($map['root']) && $map['root'] == 'rw') {
       $map = array('root' => 'rw');
     }
     //root:r cannot coexist with other 'r' scopes:
-    if($map['root'] == 'r') {
+    if(isset($map['root']) && $map['root'] == 'r') {
       foreach($map as $module => $level) {
         if($module != 'root' && $level == 'r') {
           unset($map[$module]);
