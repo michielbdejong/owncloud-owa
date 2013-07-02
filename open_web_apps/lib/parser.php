@@ -44,9 +44,9 @@ class MyParser {
       return array(null, null);
     }
     $hostParts = explode(':', $parts[2]);
-    $hostName = ereg_replace('[^a-zA-Z0-9\-\.]', '', $hostParts[0]);
+    $hostName = preg_replace('#[^a-zA-Z0-9\-\.]#i', '', $hostParts[0]);
     if(count($hostParts) == 2) {
-      $hostPort = ereg_replace('[^0-9]', '', $hostParts[1]);
+      $hostPort = preg_replace('#[^0-9]#i', '', $hostParts[1]);
     } else if(count($hostParts) == 1) {
       $hostPort = ($protocol == 'https:' ? '443' : '80');
     } else {
@@ -56,7 +56,7 @@ class MyParser {
       'protocol' => $protocol,
       'host' => $hostName,
       'port' => $hostPort,
-      'path' => '/'.ereg_replace('[<\']', '', implode('/', array_slice($parts, 3))),
+      'path' => '/'.preg_replace('#[<\']#i', '', implode('/', array_slice($parts, 3))),
     );
     $ret['id'] = $ret['protocol'].'_'.$ret['host'].'_'.$ret['port'];
     $ret['clean'] = $ret['protocol'].'://'.$ret['host'].':'.$ret['port'].$ret['path'];
@@ -72,7 +72,7 @@ class MyParser {
         //Item names MAY contain a-z, A-Z, 0-9, %,  -, _.
         //Note: we should allow '.' too in remotestorage-01.
         //Allowing it here as an intentional violation:
-        $moduleName = ereg_replace('[^a-zA-Z0-9%\-_\.]', '', $moduleAndLevel[0]); 
+        $moduleName = preg_replace('#[^a-zA-Z0-9%\-_\.]#i', '', $moduleAndLevel[0]); 
         if(strlen($moduleName)>0 && $map[$moduleName] != 'rw') {//take the strongest one
           $map[$moduleName] = $moduleAndLevel[1];
         }
@@ -106,9 +106,9 @@ class MyParser {
     return $parts[0].'://'.$parts[1].':'.$parts[2];
   }
   public static function cleanName($dirty) {
-    return ereg_replace('[^a-zA-Z0-9%\-_\.]', '', $dirty); 
+    return preg_replace('#[^a-zA-Z0-9%\-_\.]#i', '', $dirty); 
   }
   public static function cleanUrlPath($dirty) {
-    return ereg_replace('[^a-zA-Z0-9%\-_\.\/]', '', $dirty); 
+    return preg_replace('#[^a-zA-Z0-9%\-_\.\/]#i', '', $dirty); 
   }
 }

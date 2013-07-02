@@ -79,7 +79,7 @@ class MyRest {
         if(self::may('w', $uid, $path, $headers)) {
           //todo: check for If-Match header
           $timestamp = MyStorage::store($uid, $path, self::getMimeType($headers), $body);
-         return array(200, array('ETag' => $timestamp.toString()), '');
+         return array(200, array('ETag' => strval($timestamp)), '');
          } else {
           return array(401, array(), 'Computer says no');
         }
@@ -92,7 +92,7 @@ class MyRest {
           $timestamp = MyStorage::remove($uid, $path, self::getMimeType($headers));
           if($timestamp) {
             //todo: check for If-Match header
-            return array(200, array('ETag' => $timestamp.toString()), '');
+            return array(200, array('ETag' => strval($timestamp)), '');
           } else {
             return array(404, array(), 'Not found');
           }

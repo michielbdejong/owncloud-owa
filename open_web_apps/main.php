@@ -44,14 +44,14 @@ function checkForAdd($apps) {
       $params[urldecode($parts[0])] = urldecode($parts[1]);
     }
   }
-  if($params['redirect_uri'] && $params['scope']) {
+  if(isset($params['redirect_uri']) && isset($params['scope'])) {
     $urlObj = MyParser::parseUrl($params['redirect_uri']);
     $appId = $urlObj['id'];
     if($apps[$appId]) {
       $scopeDiff = calcScopeDiff($apps[$appId]['scope'], $params['scope']);
       if($scopeDiff) {
         return array(
-	  'scope_diff_id' => $appId,
+          'scope_diff_id' => $appId,
           'scope_diff_add' => $scopeDiff
         );
       } else {
@@ -65,6 +65,8 @@ function checkForAdd($apps) {
         'adding_scope' => MyParser::parseScope($params['scope'])//scope.normalized and scope.human will only contain [a-zA-Z0-9%\-_\.] and spaces
       );
     }
+  } else {//no app to add
+    return array();
   }
 }
 

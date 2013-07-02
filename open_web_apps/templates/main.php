@@ -2,7 +2,7 @@
 <div style="width:100%" id="icons">
 <?php
   foreach($_['apps'] as $id => $obj) {
-    if($_['scope_diff_id']==$id) {
+    if(isset($_['scope_diff_id']) && $_['scope_diff_id']==$id) {
       echo '<div class="square" style="border-style:dotted">'
         . '<img width="128px" height="128px" src="'.$obj['icon_url'].'">'
         . '<p>' . $obj['name'] . '</p></div>'
@@ -17,7 +17,7 @@
         . '<a href="' . $obj['launch_url']
         . '#remotestorage=' . urlencode($_['user_address'])
         . '&access_token=' . urlencode($obj['token'])
-        . '&scope=' . urlencode($obj['scope']['normalized'])
+        . '&scope=' . urlencode($obj['scope'])
         . '">'
         . '<img width="128px" height="128px" src="' . $obj['icon_url']
         . '">'
@@ -25,7 +25,7 @@
         . '</a> </div>';
     }
   }
-  if($_['adding_id']) {
+  if(isset($_['adding_id']) && $_['adding_id']) {
     echo '<div class="square" style="border-style:dotted">'
       . '<img width="128px" height="128px" src="">'
       . '<p>' . $_['adding_name'] . '</p></div>'
