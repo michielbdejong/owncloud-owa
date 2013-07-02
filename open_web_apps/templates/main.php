@@ -1,10 +1,9 @@
-<style> .square { border-style: solid; border-width: 2px; float: left; width: 160px; height: 160px; display: block; overflow: hidden; text-align: center; border-radius: 5px } </style>
+<style> .square { border-style: solid; border-width: 2px; float: left; width: 160px; height: 60px; display: block; overflow: hidden; text-align: center; border-radius: 5px } </style>
 <div style="width:100%" id="icons">
 <?php
   foreach($_['apps'] as $id => $obj) {
     if(isset($_['scope_diff_id']) && $_['scope_diff_id']==$id) {
       echo '<div class="square" style="border-style:dotted">'
-        . '<img width="128px" height="128px" src="'.$obj['icon_url'].'">'
         . '<p>' . $obj['name'] . '</p></div>'
         . '<p>wants '.$_['scope_diff_add']['human']
         .'. <input type="submit" value="Allow" id="allowBtn"'
@@ -19,15 +18,15 @@
         . '&access_token=' . urlencode($obj['token'])
         . '&scope=' . urlencode($obj['scope'])
         . '">'
-        . '<img width="128px" height="128px" src="' . $obj['icon_url']
-        . '">'
         . '<p>' . $obj['name'] . '</p>'
-        . '</a> </div>';
+        . '<input type="submit" value="Launch" />'
+        . '</a>'
+        . '<input type="submit" value="Remove" />'
+        . ' </div>';
     }
   }
   if(isset($_['adding_id']) && $_['adding_id']) {
     echo '<div class="square" style="border-style:dotted">'
-      . '<img width="128px" height="128px" src="">'
       . '<p>' . $_['adding_name'] . '</p></div>'
       . '<p>wants '.$_['adding_scope']['human']
       .'. <input type="submit" value="Install" id="allowBtn"'
@@ -37,9 +36,5 @@
       .' /></p>';
   }
 ?>
-</div>
-<div style=" clear: left ">
-  Manifest: <input id="manifestUrl" value="https://music-michiel.5apps.com/michiel_music.webapp" style="width:20em" />
-  <input type="submit" value="add manifest" id="addManifestBtn" />
 </div>
 <script src="/apps/open_web_apps/js/main.js"></script>
