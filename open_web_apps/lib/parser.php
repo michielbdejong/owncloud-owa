@@ -48,7 +48,7 @@ class MyParser {
     if(count($hostParts) == 2) {
       $hostPort = preg_replace('#[^0-9]#i', '', $hostParts[1]);
     } else if(count($hostParts) == 1) {
-      $hostPort = ($protocol == 'https:' ? '443' : '80');
+      $hostPort = ($protocol == 'https' ? '443' : '80');
     } else {
       return array();
     }
