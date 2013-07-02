@@ -6,7 +6,7 @@
       echo '<div class="square" style="border-style:dotted">'
         . '<p>' . $obj['name'] . '</p></div>'
         . '<p>wants '.$_['scope_diff_add']['human']
-        .'. <input type="submit" value="Allow" id="allowBtn"'
+        .'. <input type="submit" value="Allow & launch" id="allowBtn"'
         .'  data-launch-url="'.$obj['launch_url'].'"'
         .'  data-name="'.$obj['name'].'"'
         .'  data-scope="'.$_['scope_diff_add']['normalized'].'"'
@@ -21,19 +21,21 @@
         . '<p>' . $obj['name'] . '</p>'
         . '<input type="submit" value="Launch" />'
         . '</a>'
-        . '<input type="submit" value="Remove" />'
+        . '<input type="submit" value="Remove" class="removeBtn"'
+        .'  data-id="'.$id.'"'
+        .' />'
         . ' </div>';
     }
   }
   if(isset($_['adding_id']) && $_['adding_id']) {
     echo '<div class="square" style="border-style:dotted">'
-      . '<p>' . $_['adding_name'] . '</p></div>'
+      . '<p>' . $_['adding_name'] . '</p>'
       . '<p>wants '.$_['adding_scope']['human']
-      .'. <input type="submit" value="Install" id="allowBtn"'
+      .'. <input type="submit" value="Add & launch" id="allowBtn"'
         .'  data-launch-url="'.$_['adding_launch_url'].'"'
         .'  data-name="'.$_['adding_name'].'"'
         .'  data-scope="'.$_['adding_scope']['normalized'].'"'
-      .' /></p>';
+      .' /></p></div>';
   }
 ?>
 </div>

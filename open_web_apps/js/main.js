@@ -8,6 +8,15 @@ if(allowBtn) {
     );
   };
 }
+var removeBtns = document.getElementsByClassName('removeBtn');
+for(var i=0; i<removeBtns.length; i++) {
+  removeBtns[i].onclick = (function(btn) {
+    return function() {
+      removeApp(btn.getAttribute('data-id'));
+    };
+  })(removeBtns[i]);
+}
+
   function ajax(endpoint, params, cb) {
     var xhr = new XMLHttpRequest();
     var path = '/?app=open_web_apps&getfile=ajax/'+endpoint;
@@ -45,11 +54,11 @@ if(allowBtn) {
       name: name,
       scope: scope
     }, function() {
-     window.location = '';
+     window.location = launchUrl;
     });
   }
 
-  function removeApp(token) {
+  function removeApp(id) {
     ajax('removeapp.php', {
       id: id
     }, function() {
