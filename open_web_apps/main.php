@@ -47,7 +47,7 @@ function checkForAdd($apps) {
   if(isset($params['redirect_uri']) && isset($params['scope'])) {
     $urlObj = MyParser::parseUrl($params['redirect_uri']);
     $appId = $urlObj['id'];
-    if($apps[$appId]) {
+    if(isset($apps[$appId])) {
       $scopeDiff = calcScopeDiff($apps[$appId]['scope'], $params['scope']);
       if($scopeDiff) {
         return array(
