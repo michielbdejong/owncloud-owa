@@ -31,7 +31,7 @@ function handle() {
   $scope = MyParser::parseScope($params['scope']);
   $token = MyApps::store($urlObj['id'], $urlObj['path'], $name, '/favicon.ico', $scope['map']);
   if($token) {
-    OCP\JSON::success(array());
+    OCP\JSON::success(array('token' => $token));
   } else {
     OCP\JSON::error('could not store');
   }

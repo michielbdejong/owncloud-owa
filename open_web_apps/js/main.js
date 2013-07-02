@@ -3,6 +3,7 @@ if(allowBtn) {
   allowBtn.onclick = function() {
     addApp(
       allowBtn.getAttribute('data-launch-url'),
+      allowBtn.getAttribute('data-useraddress'),
       allowBtn.getAttribute('data-name'),
       allowBtn.getAttribute('data-scope')
     );
@@ -48,13 +49,22 @@ for(var i=0; i<removeBtns.length; i++) {
     });
   }
 
-  function addApp(launchUrl, name, scope) {
+  function addApp(launchUrl, userAddress, name, scope) {
     ajax('addapp.php', {
       launch_url: launchUrl,
       name: name,
       scope: scope
-    }, function() {
-     window.location = launchUrl;
+    }, function(err, data) {
+      var res;
+      try {
+        res = JSON.parse(data.content);
+        window.location = launchUrl
+          + '#remotestorage=' + encodeURIComponent(userAddress)
+          + '&access_token=' + encodeURIComponent(res.token)
+          + '&scope=' + encodeURIComponent(scope);
+      } catch(e) {
+        console.log('could not launch app', err, data);
+      }
     });
   }
 
