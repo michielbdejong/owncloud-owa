@@ -1,6 +1,6 @@
 function ajax(endpoint, params, cb) {
   var xhr = new XMLHttpRequest();
-  var path = '/?app=open_web_apps&getfile=ajax/'+endpoint;
+  var path = '/owncloud/?app=open_web_apps&getfile=ajax/'+endpoint;
   xhr.open('POST', path, true);
   xhr.onreadystatechange = function() {
     if(xhr.readyState == 4) {

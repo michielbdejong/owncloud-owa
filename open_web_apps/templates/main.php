@@ -52,4 +52,4 @@
   }
 ?>
 </div>
-<script src="/apps/open_web_apps/js/main.js"></script>
+<script src="/owncloud/apps/open_web_apps/js/main.js"></script>
