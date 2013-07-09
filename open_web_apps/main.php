@@ -27,7 +27,10 @@ require_once 'open_web_apps/lib/apps.php';
 require_once 'open_web_apps/lib/parser.php';
 
 function calcScopeDiff($existingScope, $addingScope) {
-  $existingScope = MyParser::parseScope($existingScope)['normalized'];//this shouldn't be necessary if the db is clean
+  //this shouldn't be necessary if the db is clean:
+  $existingScope = MyParser::parseScope($existingScope);
+  $existingScope = $existingScope['normalized'];
+  
   $newScopeObj = MyParser::parseScope($existingScope.' '.$addingScope);
   if($newScopeObj['normalized'] == $existingScope) {
     return false;
