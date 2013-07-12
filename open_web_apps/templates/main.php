@@ -1,4 +1,4 @@
-<style> .square { border-style: solid; border-width: 2px; float: left; width: 160px; height: 60px; display: block; overflow: hidden; text-align: center; border-radius: 5px } </style>
+<style> .square { border-style: solid; border-width: 2px; float: left; width: 160px; height: 120px; display: block; overflow: hidden; text-align: center; border-radius: 5px } </style>
 <div style="width:100%" id="icons">
 <?php
   if(isset($_['launch_app'])) {
@@ -13,7 +13,7 @@
   } else {
     foreach($_['apps'] as $id => $obj) {
       if(isset($_['scope_diff_id']) && $_['scope_diff_id']==$id) {
-        echo '<div class="square" style="border-style:dotted;height:120px">'
+        echo '<div class="square" style="border-style:dotted;height:160px">'
           . '<p>' . $obj['name'] . '</p>'
           . '<p>wants '.$_['scope_diff_add']['human']
           .'. <input type="submit" value="Allow & launch" id="allowBtn"'
@@ -39,7 +39,7 @@
       }
     }
     if(isset($_['adding_id']) && $_['adding_id']) {
-      echo '<div class="square" style="border-style:dotted;height=120px">'
+      echo '<div class="square" style="border-style:dotted;height=160px">'
         . '<p>' . $_['adding_name'] . '</p>'
         . '<p> wants '.$_['adding_scope']['human']
         .'. <input type="submit" value="Add & launch" id="allowBtn"'

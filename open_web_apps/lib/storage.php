@@ -42,9 +42,9 @@ class MyStorage {
         }
         if($entry != '.' && $entry != '..') {
           if($view->is_dir($path.$entry)) {
-            $res[$entry.'/'] = $view->filemtime($path.$entry);
+            $res[$entry.'/'] = strval($view->filemtime($path.$entry));
           } else {
-            $res[$entry] = $view->filemtime($path.$entry);
+            $res[$entry] = strval($view->filemtime($path.$entry));
           }
         }
       }

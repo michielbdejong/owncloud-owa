@@ -49,7 +49,7 @@ class MyRest {
     return $headers['Content-Type'];
   }
   private static function isDir($path) {
-    return (substr($path, -1) == '/');
+    return ($path == '' || substr($path, -1) == '/');
   }
   static function HandleRequest($verb, $uid, $path, $headers, $body) {
     if($verb == 'GET') {
