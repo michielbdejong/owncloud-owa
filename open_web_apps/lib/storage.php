@@ -57,7 +57,10 @@ class MyStorage {
     $view = self::getView($uid);
 		if($view->file_exists($path)) {
       $contents = $view->file_get_contents($path);
-      $mimeType = xattr_get(OC_Config::getValue( "datadirectory", OC::$SERVERROOT.'/data' ).$view->getAbsolutePath($path), 'Content-Type');
+      try {
+        $mimeType = xattr_get(OC_Config::getValue( "datadirectory", OC::$SERVERROOT.'/data' ).$view->getAbsolutePath($path), 'Content-Type');
+      } catch(Exception $e) {
+      }
       if(!$mimeType) {
         $mimeType = 'application/octet-stream';
       }
@@ -77,7 +80,7 @@ class MyStorage {
       $view->mkdir(implode('/', array_slice($pathParts, 0, $i)));
     }
     $view->file_put_contents($path, $contents);
-    xattr_set(OC_Config::getValue( "datadirectory", OC::$SERVERROOT.'/data' ).$view->getAbsolutePath($path), 'Content-Type', $mimeType);
+    @xattr_set(OC_Config::getValue( "datadirectory", OC::$SERVERROOT.'/data' ).$view->getAbsolutePath($path), 'Content-Type', $mimeType);
     return $view->filemtime($path);
   }
 
