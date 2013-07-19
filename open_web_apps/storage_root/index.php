@@ -52,6 +52,7 @@ if($headers['Origin']) {
 header('Access-Control-Allow-Origin: '.$originToAllow);
 header('Access-Control-Allow-Methods: GET, PUT, DELETE');
 header('Access-Control-Allow-Headers: Origin, ETag, If-Match, If-None-Match, Content-Type, Content-Length, Authorization');
+header('Access-Control-Expose-Headers: ETag, Content-Type, Content-Length');
 foreach($response[1] as $k => $v) {
   header("$k: $v");
 }
