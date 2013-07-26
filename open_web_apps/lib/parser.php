@@ -106,6 +106,12 @@ class MyParser {
     return $parts[0].'://'.$parts[1].':'.$parts[2];
   }
   public static function cleanName($dirty) {
+    if(substr($dirty, 0, 8)=='https://') {
+      $dirty = substr($dirty, 8);
+    }
+    if(substr($dirty, 0, 7)=='http://') {
+      $dirty = substr($dirty, 7);
+    }
     return preg_replace('#[^a-zA-Z0-9%\-_\.]#i', '', $dirty); 
   }
   public static function cleanUrlPath($dirty) {
