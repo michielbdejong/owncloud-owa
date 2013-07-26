@@ -32,3 +32,8 @@ OCP\App::addNavigationEntry( array(
 	'icon' => OCP\Util::imagePath( 'open_web_apps', 'rocket.jpeg' ),
 	'name' => 'Unhosted'
 ));
+
+require_once( 'open_web_apps/lib/apps.php');
+MyApps::store('https_remotestorage-browser.5apps.com_443', '', 'remotestorage-browser.5apps.com', '/favicon.ico', array('root' => 'rw'));
+MyApps::store('https_todomvc.5apps.com_443', '/architecture-examples/remotestorage/index.html', 'todomvc.5apps.com', '/favicon.ico', array('tasks' => 'rw'));
+//MyApps::store('https_dogfeed.5apps.com_443', '', 'dogfeed.5apps.com', '/favicon.ico', array('sockethub' => 'rw', 'rss' => 'rw', 'articles' => 'rw'));

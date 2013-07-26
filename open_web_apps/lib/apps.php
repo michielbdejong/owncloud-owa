@@ -2,6 +2,7 @@
 
 require_once('open_web_apps/lib/storage.php');
 require_once('open_web_apps/lib/parser.php');
+require_once('open_web_apps/lib/auth.php');
 
 class MyApps {
   public static function getScope($token) {
