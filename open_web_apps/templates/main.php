@@ -24,7 +24,7 @@
           .' /></p>';
       } else {
         echo '<div class="square">'
-          . '<a href="' . $obj['launch_url']
+          . '<a target="_blank" href="' . $obj['launch_url']
           . '#remotestorage=' . urlencode($_['user_address'])
           . '&access_token=' . urlencode($obj['token'])
           . '&scope=' . urlencode($obj['scope'])

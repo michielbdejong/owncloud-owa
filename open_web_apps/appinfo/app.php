@@ -34,6 +34,9 @@ OCP\App::addNavigationEntry( array(
 ));
 
 require_once( 'open_web_apps/lib/apps.php');
-MyApps::store('https_remotestorage-browser.5apps.com_443', '/', 'remotestorage-browser.5apps.com', '/favicon.ico', array('root' => 'rw'));
-MyApps::store('https_todomvc.5apps.com_443', '/labs/architecture-examples/remotestorage/index.html', 'todomvc.5apps.com', '/favicon.ico', array('tasks' => 'rw'));
-//MyApps::store('https_dogfeed.5apps.com_443', '', 'dogfeed.5apps.com', '/favicon.ico', array('sockethub' => 'rw', 'rss' => 'rw', 'articles' => 'rw'));
+if(count(MyApps::getApps(OCP\USER::getUser()))==0) {
+  MyApps::store('https_remotestorage-browser.5apps.com_443', '/', 'remotestorage-browser.5apps.com', '/favicon.ico', array('root' => 'rw'));
+  MyApps::store('https_drinks-unhosted.5apps.com_443', '/', 'drinks-unhosted.5apps.com', '/favicon.ico', array('drinks' => 'rw'));
+  //MyApps::store('https_todomvc.5apps.com_443', '/labs/architecture-examples/remotestorage/index.html', 'todomvc.5apps.com', '/favicon.ico', array('tasks' => 'rw'));
+  //MApps::store('https_dogfeed.5apps.com_443', '', 'dogfeed.5apps.com', '/favicon.ico', array('sockethub' => 'rw', 'rss' => 'rw', 'articles' => 'rw'));
+}
