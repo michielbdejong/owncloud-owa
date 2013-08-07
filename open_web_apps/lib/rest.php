@@ -64,7 +64,6 @@ class MyRest {
           foreach($matchers as $m) {
             if($m == strval($obj['timestamp'])) {
               return array(304, array('ETag' => strval($obj['timestamp'])));
-            } else {
             }
           }
           return array(200, array('Content-Type' => $obj['mimeType'], 'ETag' => strval($obj['timestamp'])), $obj['content']);
