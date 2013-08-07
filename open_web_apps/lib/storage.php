@@ -34,11 +34,13 @@ class MyStorage {
   static function getDir($uid, $path) {
     $view = self::getView($uid);
     $res = array();
+    $timestamp = '0';
 		if($view->file_exists($path)) {
-      $handle=$view->opendir($path);      
+      $timestamp = strval($view->filemtime($path));
+      $handle=$view->opendir($path);
       while (false !== ($entry = readdir($handle))) {
         if($entry==null) {
-          return $res;
+          break;
         }
         if($entry != '.' && $entry != '..') {
           if($view->is_dir($path.$entry)) {
@@ -49,8 +51,12 @@ class MyStorage {
         }
       }
       closedir($handle);
-    }//else, res stays as an empty array
-    return $res;
+    }//else, return an empty array
+    return array(
+       'timestamp' => $timestamp,
+       'mimeType' => 'application/json',
+       'content' => json_encode($res)
+    );
   }
   
   static function get($uid, $path) {

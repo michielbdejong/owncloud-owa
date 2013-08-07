@@ -55,11 +55,7 @@ class MyRest {
     if($verb == 'GET') {
       if(self::may((self::isDir($path)?'l':'r'), $uid, $path, $headers)) {
         if(self::isDir($path)) {
-          $obj = array(
-            'timestamp' => 0,
-            'mimeType' => 'application/json',
-            'content' => json_encode(MyStorage::getDir($uid, $path))
-          );
+          $obj = MyStorage::getDir($uid, $path);
         } else {
           $obj = MyStorage::get($uid, $path);
         }
