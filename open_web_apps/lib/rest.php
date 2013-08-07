@@ -60,7 +60,13 @@ class MyRest {
           $obj = MyStorage::get($uid, $path);
         }
         if($obj['mimeType']) {
-          //todo: check for If-None-Match header
+          $matchers = explode(',', $headers['If-None-Match']);
+          foreach($matchers as $m) {
+            if($m == strval($obj['timestamp'])) {
+              return array(304, array('ETag' => strval($obj['timestamp'])));
+            } else {
+            }
+          }
           return array(200, array('Content-Type' => $obj['mimeType'], 'ETag' => strval($obj['timestamp'])), $obj['content']);
         } else {
           return array(404, array(), 'Not found');
