@@ -51,11 +51,11 @@ class MyStorage {
         }
       }
       closedir($handle);
-    }//else, return an empty array
+    }
     return array(
-       'timestamp' => $timestamp,
-       'mimeType' => 'application/json',
-       'content' => json_encode($res)
+      'timestamp' => $timestamp,
+      'mimeType' => (count($res)?'application/json':null),//null mimetype will trigger 404 response
+      'content' => json_encode($res)
     );
   }
   
