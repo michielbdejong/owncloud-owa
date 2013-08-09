@@ -49,7 +49,13 @@ class MyRest {
     return $headers['Content-Type'];
   }
   private static function getIfMatch($headers) {
-    return $headers['If-Match'];
+    if($headers['If-None-Match'] == '*') {
+      return null;
+    } else if($headers['If-Match']) {
+      return $headers['If-Match'];
+    } else {
+      return array();//something that is not null and not a string
+    }
   }
   private static function isDir($path) {
     return ($path=='' || substr($path, -1) == '/');

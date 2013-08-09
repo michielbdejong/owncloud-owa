@@ -91,7 +91,7 @@ class MyStorage {
       }
     } else if($matchThis) {
       if(!$view->file_exists($path)
-          || $matchThis != $view->filemtime($path)) {
+          || $matchThis !== strval($view->filemtime($path))) {
         return array('match'=>false);
       }
     } // else no If-Match or If-None-Match header was sent
@@ -119,7 +119,7 @@ class MyStorage {
     if(!$view->file_exists($path)) {
       return false;
     }
-    if($matchThis && $matchThis != $view->filemtime($path)) {
+    if($matchThis && $matchThis != strval($view->filemtime($path))) {
       return array('match'=>false);
     }
     $timestamp = $view->filemtime($path);
