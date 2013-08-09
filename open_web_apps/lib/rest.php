@@ -48,6 +48,9 @@ class MyRest {
   private static function getMimeType($headers) {
     return $headers['Content-Type'];
   }
+  private static function getIfMatch($headers) {
+    return $headers['If-Match'];
+  }
   private static function isDir($path) {
     return ($path=='' || substr($path, -1) == '/');
   }
@@ -63,7 +66,7 @@ class MyRest {
           $matchers = explode(',', $headers['If-None-Match']);
           foreach($matchers as $m) {
             if($m == strval($obj['timestamp'])) {
-              return array(304, array('ETag' => strval($obj['timestamp'])));
+//              return array(304, array('ETag' => strval($obj['timestamp'])));
             }
           }
           return array(200, array('Content-Type' => $obj['mimeType'], 'ETag' => strval($obj['timestamp'])), $obj['content']);
@@ -79,8 +82,8 @@ class MyRest {
       } else {
         if(self::may('w', $uid, $path, $headers)) {
           //todo: check for If-Match header
-          $timestamp = MyStorage::store($uid, $path, self::getMimeType($headers), $body);
-         return array(200, array('ETag' => strval($timestamp)), '');
+          $res = MyStorage::store($uid, $path, self::getMimeType($headers), self::getIfMatch($headers), $body);
+         return array($res['match']?200:412, array('ETag' => strval($res['timestamp'])), '');
          } else {
           return array(401, array(), 'Computer says no');
         }
@@ -90,10 +93,9 @@ class MyRest {
         return array(401, array(), 'Computer says no');
       } else {
         if(self::may('d', $uid, $path, $headers)) {
-          $timestamp = MyStorage::remove($uid, $path, self::getMimeType($headers));
-          if($timestamp) {
-            //todo: check for If-Match header
-            return array(200, array('ETag' => strval($timestamp)), '');
+          $res = MyStorage::remove($uid, $path, self::getIfMatch($headers));
+          if($res['timestamp']) {
+            return array($res['match']?200:412, array('ETag' => strval($res['timestamp'])), '');
           } else {
             return array(404, array(), 'Not found');
           }

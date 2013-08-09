@@ -79,7 +79,7 @@ class MyStorage {
       return array();
     }
   }
-  static function store($uid, $path, $mimeType, $contents) {
+  static function store($uid, $path, $mimeType, $matchThis, $contents) {
     $view = self::getView($uid);
     $pathParts = explode('/', $path);
     for($i=1; $i<count($pathParts); $i++) {
@@ -87,7 +87,7 @@ class MyStorage {
     }
     $view->file_put_contents($path, $contents);
     @xattr_set(OC_Config::getValue( "datadirectory", OC::$SERVERROOT.'/data' ).$view->getAbsolutePath($path), 'Content-Type', $mimeType);
-    return $view->filemtime($path);
+    return array('match' => true, 'timestamp' => $view->filemtime($path));
   }
 
   private static function getContainingDir($path) {
@@ -103,7 +103,7 @@ class MyStorage {
     }
     return substr(implode('/', array_slice($pathParts, 0, count($pathParts)-$chop)).'/', 1);
   }
-  static function remove($uid, $path) {
+  static function remove($uid, $path, $matchThis) {
     $view = self::getView($uid);
     $stat = $view->stat($path);
     if(!$stat) {
@@ -121,6 +121,6 @@ class MyStorage {
       }
       $path = self::getContainingDir($path);
     }
-    return $timestamp;
+    return array('match' => true, 'timestamp' => $timestamp);
   }
 }
