@@ -85,6 +85,17 @@ class MyStorage {
     for($i=1; $i<count($pathParts); $i++) {
       $view->mkdir(implode('/', array_slice($pathParts, 0, $i)));
     }
+    if($matchThis===null) {//If-None-Match: *
+      if($view->file_exists($path)) {
+        return array('match'=>false);
+      }
+    } else if($matchThis) {
+      if(!$view->file_exists($path)
+          || $matchThis != $view->filemtime($path)) {
+        return array('match'=>false);
+      }
+    } // else no If-Match or If-None-Match header was sent
+
     $view->file_put_contents($path, $contents);
     @xattr_set(OC_Config::getValue( "datadirectory", OC::$SERVERROOT.'/data' ).$view->getAbsolutePath($path), 'Content-Type', $mimeType);
     return array('match' => true, 'timestamp' => $view->filemtime($path));
@@ -105,9 +116,11 @@ class MyStorage {
   }
   static function remove($uid, $path, $matchThis) {
     $view = self::getView($uid);
-    $stat = $view->stat($path);
-    if(!$stat) {
+    if(!$view->file_exists($path)) {
       return false;
+    }
+    if($matchThis && $matchThis != $view->filemtime($path)) {
+      return array('match'=>false);
     }
     $timestamp = $view->filemtime($path);
     $view->unlink($path);
