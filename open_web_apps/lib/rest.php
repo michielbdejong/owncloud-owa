@@ -101,7 +101,7 @@ class MyRest {
         if(self::may('d', $uid, $path, $headers)) {
           $res = MyStorage::remove($uid, $path, self::getIfMatch($headers));
           if($res['timestamp']) {
-            return array($res['match']?200:412, array('ETag' => strval($res['timestamp'])), '');
+            return array($res['match']?200:412, array('ETag' => $res['timestamp']), '');
           } else {
             return array(404, array(), 'Not found');
           }

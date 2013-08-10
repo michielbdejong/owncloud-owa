@@ -119,10 +119,10 @@ class MyStorage {
     if(!$view->file_exists($path)) {
       return false;
     }
-    if($matchThis && $matchThis != strval($view->filemtime($path))) {
-      return array('match'=>false);
+    $timestamp = strval($view->filemtime($path));
+    if($matchThis && $matchThis != $timestamp) {
+      return array('match'=>false, 'timestamp'=>$timestamp);
     }
-    $timestamp = $view->filemtime($path);
     $view->unlink($path);
     $path = self::getContainingDir($path);
     while($path != null) {
