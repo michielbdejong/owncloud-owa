@@ -64,7 +64,7 @@ class MyStorage {
 		if($view->file_exists($path)) {
       $contents = $view->file_get_contents($path);
       try {
-        $mimeType = xattr_get(OC_Config::getValue( "datadirectory", OC::$SERVERROOT.'/data' ).$view->getAbsolutePath($path), 'Content-Type');
+        $mimeType = @xattr_get(OC_Config::getValue( "datadirectory", OC::$SERVERROOT.'/data' ).$view->getAbsolutePath($path), 'Content-Type');
       } catch(Exception $e) {
       }
       if(!$mimeType) {
