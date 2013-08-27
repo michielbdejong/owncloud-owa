@@ -19,7 +19,7 @@ a2ensite default-8012
 echo edit /var/www/.well-known/webfinger and replace 'dragon.unhosted.org' with your server's hostname.
 
 echo add two lines 'NameVirtualHost *:8012' and 'Listen 8012' to /etc/apache2/ports.conf
-
+echo add a line 'extension=xattr.so' to /etc/php5/apache2/php.ini
 
 echo on line 11 of /etc/apache2/sites-enabled/000-default change 'None' to 'All'
 a2enmod headers
